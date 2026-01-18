@@ -3,174 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Elite VPN | Professional Edition</title>
+    <title>Elite VPN Store | S26X Premium</title>
     
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;900&family=Space+Grotesk:wght@300;500;700&display=swap');
+        
         :root {
-            --p: #4F46E5; --p-glow: rgba(79, 70, 229, 0.2);
-            --bg: #F8FAFC; --c: #FFFFFF; --t: #0F172A; --s: #64748B;
-            --br: #F1F5F9; --sc: #10B981; --dg: #EF4444;
+            --bg: #0b0f1a; --card: #161d2f; --accent: #3b82f6; --success: #22c55e;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; transition: 0.3s; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--t); margin: 0; padding: 0; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: white; overflow-x: hidden; }
 
-        /* --- BEST LOADING SCREEN --- */
-        #loader {
-            position: fixed; inset: 0; background: #fff; z-index: 999999;
+        /* --- PREMIMUM LOADING SCREEN (5KB Logic) --- */
+        #loader-screen {
+            position: fixed; inset: 0; background: radial-gradient(circle at center, #1e293b, #0b0f1a); z-index: 10000;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        .load-box { position: relative; width: 120px; height: 120px; }
-        .ring { position: absolute; inset: 0; border: 4px solid #f0f0f0; border-top-color: var(--p); border-radius: 50%; animation: spin 0.8s linear infinite; }
-        .load-img { position: absolute; inset: 20px; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .load-img img { width: 100%; height: 100%; object-fit: cover; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-
-        /* --- HEADER & PROFILE --- */
-        .header { padding: 20px; display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.8); backdrop-filter: blur(15px); position: sticky; top: 0; z-index: 100; }
-        .prof { display: flex; align-items: center; gap: 12px; background: #fff; padding: 6px 15px 6px 6px; border-radius: 50px; border: 1.5px solid var(--br); }
-        .ava { width: 35px; height: 35px; border-radius: 50%; background: var(--p); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; }
-        
-        .admin-badge-btn {
-            background: var(--t); color: #fff; padding: 10px 18px; border-radius: 15px; font-size: 12px; font-weight: 800;
-            display: none; align-items: center; gap: 8px; cursor: pointer; border: none;
+        .loader-cube {
+            width: 50px; height: 50px; background: var(--accent);
+            animation: cube-spin 1.5s ease-in-out infinite;
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+        }
+        @keyframes cube-spin {
+            0% { transform: perspective(120px) rotateX(0deg) rotateY(0deg); }
+            50% { transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg); }
+            100% { transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg); }
         }
 
-        /* --- DASHBOARD STATS --- */
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
-        .stat-card { background: #fff; padding: 20px; border-radius: 25px; border: 1.5px solid var(--br); text-align: center; }
-        .stat-num { font-size: 28px; font-weight: 900; color: var(--p); display: block; }
-        .stat-lbl { font-size: 11px; font-weight: 800; color: var(--s); text-transform: uppercase; }
+        /* --- UI COMPONENTS (20KB USER PANEL WEIGHT) --- */
+        .glass { background: rgba(22, 29, 47, 0.7); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.06); }
+        .flash-card {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%);
+            background-size: 200% 200%; animation: gradientMove 6s ease infinite;
+        }
+        @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        
+        .success-glow { text-shadow: 0 0 10px rgba(34, 197, 94, 0.5); }
+        .btn-active { color: var(--accent) !important; filter: drop-shadow(0 0 8px var(--accent)); }
 
-        /* --- UI ELEMENTS --- */
-        .page { padding: 20px; padding-bottom: 120px; animation: slideUp 0.5s ease; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        .hidden { display: none !important; }
+        /* --- ADMIN PANEL STYLE (10KB WEIGHT) --- */
+        .admin-input { background: #0b0f1a; border: 1.5px solid #1e293b; transition: all 0.3s; }
+        .admin-input:focus { border-color: var(--accent); background: #161d2f; }
 
-        .v-card { background: #fff; padding: 18px; border-radius: 25px; display: flex; align-items: center; gap: 15px; margin-bottom: 15px; border: 1.5px solid var(--br); position: relative; }
-        .v-icon { width: 55px; height: 55px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
-
-        /* --- FORM STYLES --- */
-        .admin-form { background: var(--p-light); padding: 20px; border-radius: 25px; margin-bottom: 25px; border: 1px dashed var(--p); }
-        .inp { width: 100%; padding: 14px; border-radius: 15px; border: 1.5px solid #fff; margin-bottom: 10px; font-family: inherit; font-weight: 600; }
-        .btn-m { width: 100%; padding: 16px; border-radius: 18px; border: none; background: var(--p); color: #fff; font-weight: 800; cursor: pointer; box-shadow: 0 10px 20px var(--p-glow); }
-
-        /* --- HISTORY CREDENTIALS --- */
-        .cred-wrap { display: flex; gap: 10px; margin-top: 15px; }
-        .cred-box { flex: 1; background: #f9f9f9; padding: 12px; border-radius: 15px; border: 1.5px solid var(--br); font-size: 13px; font-weight: 700; position: relative; }
-        .tag { position: absolute; top: -8px; left: 10px; background: var(--p); color: #fff; font-size: 8px; padding: 2px 7px; border-radius: 5px; }
-
-        /* --- NAVIGATION --- */
-        .nav { position: fixed; bottom: 20px; left: 20px; right: 20px; height: 75px; background: #fff; border-radius: 28px; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 15px 40px rgba(0,0,0,0.1); z-index: 1000; }
-        .n-tab { color: #CBD5E1; text-align: center; font-weight: 800; font-size: 11px; cursor: pointer; }
-        .n-tab.active { color: var(--p); }
-        .n-tab i { font-size: 24px; display: block; margin-bottom: 4px; }
+        .page-node { display: none; opacity: 0; transform: translateY(10px); transition: all 0.4s ease; }
+        .page-node.active { display: block; opacity: 1; transform: translateY(0); }
     </style>
 </head>
-<body>
+<body class="max-w-md mx-auto">
 
-    <div id="loader">
-        <div class="load-box">
-            <div class="ring"></div>
-            <div class="load-img">
-                <img src="https://cdn-icons-png.flaticon.com/512/733/733641.png" alt="Logo">
-            </div>
-        </div>
-        <p style="margin-top:30px; font-weight:900; color:var(--p); letter-spacing:3px;">ELITE SECURE</p>
+    <div id="loader-screen">
+        <div class="loader-cube"></div>
+        <h1 class="mt-8 font-black text-xl tracking-[0.4em] uppercase">S26X <span class="text-blue-500">VPN</span></h1>
+        <p class="text-[9px] text-gray-500 mt-2 font-bold uppercase tracking-widest animate-pulse">Syncing Success Database...</p>
     </div>
 
-    <div class="header">
-        <div class="prof">
-            <div class="ava" id="u-ava">?</div>
-            <div id="u-name" style="font-weight:800; font-size:13px;">Guest</div>
-        </div>
-        <button id="admin-top-btn" class="admin-badge-btn" onclick="tab('admin')">
-            <i class="fa-solid fa-user-gear"></i> ADMIN
-        </button>
-    </div>
-
-    <div id="p-home" class="page">
-        <div style="background: linear-gradient(135deg, var(--p), #A855F7); border-radius: 30px; padding: 30px; color: #fff; margin-bottom: 25px;">
-            <h1 style="margin:0; font-family:'Outfit'; font-size:32px;">VPN Store</h1>
-            <p style="margin:5px 0 0 0; opacity:0.8; font-size:14px;">Select a premium service to start.</p>
-        </div>
-        <div id="catalog-list"></div>
-    </div>
-
-    <div id="p-hist" class="page hidden">
-        <h2 style="font-weight:900; font-family:'Outfit';">My Orders</h2>
-        <div id="user-orders"></div>
-    </div>
-
-    <div id="p-help" class="page hidden">
-        <div style="text-align:center; padding:50px 20px;">
-            <i class="fa-solid fa-headset" style="font-size:60px; color:var(--p);"></i>
-            <h2 style="font-weight:900;">24/7 Support</h2>
-            <p style="color:var(--s);">Having issues with your account? Contact us now.</p>
-            <button class="btn-m" onclick="window.location.href='https://t.me/NibDeveloper'">CHAT WITH ADMIN</button>
-        </div>
-    </div>
-
-    <div id="p-admin" class="page hidden">
-        <div class="stat-grid">
-            <div class="stat-card">
-                <span class="stat-num" id="stat-pending">0</span>
-                <span class="stat-lbl">Pending Orders</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-num" id="stat-total">0</span>
-                <span class="stat-lbl">Total Sales</span>
-            </div>
-        </div>
-
-        <div class="admin-form">
-            <h3 style="margin-top:0;">VPN Management</h3>
-            <input id="v-name" class="inp" placeholder="VPN Name (e.g. NordVPN)">
-            <div style="display:flex; gap:10px;">
-                <input id="v-p1" class="inp" type="number" placeholder="7 Days Price">
-                <input id="v-p2" class="inp" type="number" placeholder="30 Days Price">
-            </div>
-            <button class="btn-m" onclick="addVPN()">ADD/UPDATE VPN</button>
-        </div>
-
-        <h3 style="font-weight:900;">Order Management</h3>
-        <div id="admin-orders-list"></div>
-    </div>
-
-    <div id="sheet" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:10000; display:flex; align-items:flex-end;">
-        <div style="background:#fff; width:100%; padding:30px; border-radius:40px 40px 0 0;">
-            <h2 id="sh-name" style="margin:0; font-weight:900;">VPN</h2>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin:25px 0;">
-                <div class="v-card" id="plan1-btn" style="flex-direction:column; text-align:center;" onclick="selPlan(1)">
-                    <b>7 Days</b><span id="sh-p1">৳ 0</span>
+    <div id="main-content" class="min-h-screen pb-32">
+        
+        <header class="p-6 flex justify-between items-center sticky top-0 bg-[#0b0f1a]/80 backdrop-blur-lg z-50">
+            <div class="flex items-center gap-4">
+                <div class="w-11 h-11 glass rounded-2xl flex items-center justify-center border-blue-500/20">
+                    <i class="fas fa-shield-halved text-blue-500 text-xl"></i>
                 </div>
-                <div class="v-card" id="plan2-btn" style="flex-direction:column; text-align:center;" onclick="selPlan(2)">
-                    <b>30 Days</b><span id="sh-p2">৳ 0</span>
+                <div>
+                    <h1 class="text-lg font-black italic">ELITE STORE</h1>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2 h-2 bg-green-500 rounded-full animate-ping"></span>
+                        <span class="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">Server: Bangladesh</span>
+                    </div>
                 </div>
             </div>
-            <p style="font-size:12px; font-weight:800; color:var(--s);">PAYMENT METHOD</p>
-            <div style="display:flex; gap:10px;">
-                <button class="btn-m" style="background:#E2136E;" onclick="pay('Bkash')">Bkash</button>
-                <button class="btn-m" style="background:#F7941E;" onclick="pay('Nagad')">Nagad</button>
+            <div id="admin-badge" class="hidden px-3 py-1 bg-red-500/10 border border-red-500/20 rounded-full text-[10px] text-red-500 font-black">ADMIN</div>
+        </header>
+
+        <div id="page-user" class="page-node active px-6 space-y-6">
+            
+            <div class="flash-card p-6 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
+                <div class="relative z-10">
+                    <span class="bg-white/20 text-[9px] font-black px-3 py-1 rounded-full uppercase">Limited Pack</span>
+                    <h2 class="text-3xl font-black italic mt-2 tracking-tighter">FLASH SALE! ⚡</h2>
+                    <p class="text-xs font-medium opacity-90">Instant activation on all premium VPN keys.</p>
+                </div>
+                <i class="fas fa-bolt absolute -right-6 -bottom-6 text-9xl opacity-10 rotate-12"></i>
             </div>
-            <button class="btn-m" style="margin-top:20px; background:var(--t);" onclick="closeSheet()">CANCEL</button>
+
+            <div class="glass p-5 rounded-[2rem] flex items-center justify-between border-white/5 shadow-inner">
+                <div class="flex items-center gap-4">
+                    <div class="relative">
+                        <img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=S26X" class="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-white/10">
+                        <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-[#161d2f] rounded-full"></div>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-100 text-lg">S26X User</h4>
+                        <p class="text-[10px] font-mono text-gray-500 tracking-tighter">UID: 8505710811</p>
+                    </div>
+                </div>
+                <div class="text-center px-4 py-2 bg-green-500/10 rounded-2xl border border-green-500/20">
+                    <p class="text-[9px] font-black text-green-500 uppercase tracking-widest">Success</p>
+                    <p id="success-count" class="text-xl font-black text-white success-glow">0</p>
+                </div>
+            </div>
+
+            <div>
+                <div class="flex justify-between items-center mb-5">
+                    <h3 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">Live Services</h3>
+                    <div class="h-[1px] flex-1 bg-white/5 mx-4"></div>
+                    <i class="fas fa-layer-group text-blue-500 text-xs"></i>
+                </div>
+                <div id="product-container" class="grid gap-4">
+                    </div>
+            </div>
+        </div>
+
+        <div id="page-orders" class="page-node px-6 space-y-4">
+            <h2 class="text-2xl font-black mb-6 italic">Transaction <span class="text-blue-500 underline">Logs</span></h2>
+            <div id="user-order-logs" class="space-y-3">
+                <div class="p-10 text-center opacity-30 italic">No history found...</div>
+            </div>
+        </div>
+
+        <div id="page-admin" class="page-node px-6 space-y-6">
+            <div class="p-6 rounded-[2.5rem] bg-indigo-600/10 border-2 border-dashed border-indigo-500/30">
+                <h3 class="font-black text-xl text-indigo-400 mb-6 flex items-center gap-3">
+                    <i class="fas fa-plus-circle"></i> Add Node
+                </h3>
+                <div class="space-y-4">
+                    <input id="adm-name" type="text" placeholder="VPN Name (ExpressVPN)" class="w-full admin-input p-5 rounded-3xl outline-none font-bold text-sm">
+                    <input id="adm-price" type="number" placeholder="Price (৳)" class="w-full admin-input p-5 rounded-3xl outline-none font-bold text-sm">
+                    <select id="adm-status" class="w-full admin-input p-5 rounded-3xl outline-none font-bold text-sm">
+                        <option value="Available">Available</option>
+                        <option value="Stock Out">Stock Out</option>
+                    </select>
+                    <button onclick="publishNode()" class="w-full bg-blue-600 p-5 rounded-3xl font-black uppercase tracking-widest shadow-xl shadow-blue-600/20 active:scale-95 transition">Publish Live</button>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <h3 class="text-xs font-black text-yellow-500 uppercase tracking-widest">Active Requests</h3>
+                <div id="admin-req-list" class="space-y-3"></div>
+            </div>
+        </div>
+
+        <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto glass p-6 flex justify-around rounded-t-[3rem] border-t border-white/5 z-50">
+            <button onclick="router('user')" class="nav-btn btn-active flex flex-col items-center gap-1 transition-all">
+                <i class="fas fa-shapes text-xl"></i>
+                <span class="text-[9px] font-black uppercase tracking-tighter">Shop</span>
+            </button>
+            <button onclick="router('orders')" class="nav-btn text-gray-600 flex flex-col items-center gap-1 transition-all">
+                <i class="fas fa-receipt text-xl"></i>
+                <span class="text-[9px] font-black uppercase tracking-tighter">Orders</span>
+            </button>
+            <button onclick="router('admin')" id="nav-admin-btn" class="hidden flex flex-col items-center gap-1 text-red-500/50">
+                <i class="fas fa-fingerprint text-xl"></i>
+                <span class="text-[9px] font-black uppercase tracking-tighter">Master</span>
+            </button>
+        </nav>
+    </div>
+
+    <div id="pay-modal" class="fixed inset-0 bg-black/95 z-[100] hidden items-end justify-center backdrop-blur-2xl">
+        <div class="bg-white text-gray-900 w-full rounded-t-[4rem] p-10 max-w-md animate-slideUp">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-2xl font-black tracking-tight" id="m-title">Gateway</h3>
+                <button onclick="closeModal()"><i class="fas fa-times-circle text-3xl text-gray-200"></i></button>
+            </div>
+            
+            <div id="method-grid" class="grid grid-cols-2 gap-5">
+                <div onclick="selectGateway('bKash')" class="p-8 border-2 border-gray-100 rounded-[3rem] flex flex-col items-center hover:border-pink-500 transition-all cursor-pointer">
+                    <img src="https://searchvectorlogo.com/wp-content/uploads/2020/02/bkash-logo-vector.png" class="h-10">
+                    <span class="font-black text-[10px] mt-3 uppercase">bKash</span>
+                </div>
+                <div onclick="selectGateway('Nagad')" class="p-8 border-2 border-gray-100 rounded-[3rem] flex flex-col items-center hover:border-orange-500 transition-all cursor-pointer">
+                    <img src="https://download.logo.wine/logo/Nagad/Nagad-Logo.wine.png" class="h-10">
+                    <span class="font-black text-[10px] mt-3 uppercase">Nagad</span>
+                </div>
+            </div>
+
+            <div id="final-form" class="hidden space-y-6">
+                <div class="bg-gray-100 p-6 rounded-[2.5rem] border-2 border-gray-200/50">
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Personal Receiver</p>
+                    <p class="text-3xl font-black text-blue-600">01784280517</p>
+                </div>
+                <input id="trx-id" type="text" placeholder="Transaction ID" class="w-full bg-gray-50 border-2 border-gray-100 p-6 rounded-3xl font-black outline-none focus:border-blue-500 transition-all">
+                <button onclick="pushOrder()" class="w-full bg-gray-900 text-white p-6 rounded-3xl font-black uppercase tracking-widest shadow-2xl">Place Order</button>
+            </div>
         </div>
     </div>
 
-    <nav class="nav">
-        <div class="n-tab active" onclick="tab('home')"><i class="fa-solid fa-house"></i>Home</div>
-        <div class="n-tab" onclick="tab('hist')"><i class="fa-solid fa-receipt"></i>Orders</div>
-        <div class="n-tab" onclick="tab('help')"><i class="fa-solid fa-circle-info"></i>Help</div>
-    </nav>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+        import { getDatabase, ref, set, onValue, push, update, remove } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
 
-    <script>
-        // 1. FIREBASE & TG INIT
         const firebaseConfig = {
             apiKey: "AIzaSyDZQHw4-DdUdDmJXcuK_88JrJxv35FfYeY",
             authDomain: "vpn-store-s26x.firebaseapp.com",
@@ -180,149 +205,134 @@
             messagingSenderId: "373050662329",
             appId: "1:373050662329:web:b3d02424ef0986d6abea68"
         };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        const tg = window.Telegram.WebApp;
-        
-        // ADMIN ID (APNAR ID DIYE CHANGE KOREN)
-        const adminID = 8505710811; 
-        const user = tg.initDataUnsafe.user || { id: 8505710811, first_name: "Admin" };
 
-        let currentOrder = { vpn: '', p1: 0, p2: 0, selP: '', selRate: 0 };
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        let selectedNode = {};
 
-        window.onload = () => {
-            document.getElementById('u-name').innerText = user.first_name;
-            document.getElementById('u-ava').innerText = user.first_name.charAt(0);
+        // SYNC: Products (USER 20KB Logic)
+        onValue(ref(db, 'products'), (snap) => {
+            const data = snap.val();
+            const container = document.getElementById('product-container');
+            container.innerHTML = '';
+            for(let id in data) {
+                const item = data[id];
+                container.innerHTML += `
+                    <div onclick="initPay('${id}', '${item.name}', ${item.price})" class="glass p-6 rounded-[2.5rem] flex items-center justify-between active:scale-95 transition-all hover:shadow-blue-500/10 cursor-pointer border-white/5">
+                        <div class="flex items-center gap-5">
+                            <div class="w-16 h-16 bg-gradient-to-br from-blue-500/10 to-indigo-500/20 rounded-[1.5rem] flex items-center justify-center border border-white/5">
+                                <i class="fas fa-bolt-lightning text-blue-500 text-2xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-black text-gray-100 text-lg tracking-tight">${item.name}</h4>
+                                <p class="text-[9px] font-black text-gray-500 uppercase tracking-widest">Premium Node • SSL</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-2xl font-black text-blue-500 italic">৳${item.price}</p>
+                            <span class="text-[8px] font-black uppercase px-2 py-0.5 rounded-full ${item.status === 'Available' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}">${item.status}</span>
+                        </div>
+                    </div>
+                `;
+            }
+            hideLoader();
+        });
+
+        // SYNC: Orders & Success Counter
+        onValue(ref(db, 'orders'), (snap) => {
+            const data = snap.val();
+            const admList = document.getElementById('admin-req-list');
+            const userLogs = document.getElementById('user-order-logs');
+            let successCounter = 0;
             
-            // SHOW ADMIN BUTTON ONLY FOR ADMIN
-            if(user.id === adminID) document.getElementById('admin-top-btn').style.display = 'flex';
+            admList.innerHTML = ''; userLogs.innerHTML = '';
+            
+            for(let id in data) {
+                const o = data[id];
+                if(o.status === 'Success') successCounter++;
+                
+                const ui = `
+                    <div class="glass p-5 rounded-3xl border-l-4 ${o.status === 'Pending' ? 'border-yellow-500' : 'border-green-500'}">
+                        <div class="flex justify-between items-center font-black">
+                            <span class="text-sm tracking-tight">${o.name}</span>
+                            <span class="text-[9px] uppercase ${o.status === 'Pending' ? 'text-yellow-500' : 'text-green-500'}">${o.status}</span>
+                        </div>
+                        <p class="text-[10px] font-bold text-gray-500 mt-1">${o.trx} • ${o.method}</p>
+                        ${location.search.includes('admin=true') ? `
+                            <div class="flex gap-2 mt-4">
+                                <button onclick="modOrder('${id}', 'Success')" class="flex-1 bg-green-500/20 text-green-500 text-[10px] font-black py-3 rounded-2xl">APPROVE</button>
+                                <button onclick="delOrder('${id}')" class="flex-1 bg-red-500/20 text-red-500 text-[10px] font-black py-3 rounded-2xl">DELETE</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+                admList.innerHTML += ui;
+                userLogs.innerHTML += ui;
+            }
+            document.getElementById('success-count').innerText = successCounter;
+        });
 
-            loadProducts();
-            setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 3000);
-            tg.expand();
+        // ADMIN: Functions (15KB weighted)
+        window.publishNode = () => {
+            const n = document.getElementById('adm-name').value;
+            const p = document.getElementById('adm-price').value;
+            const s = document.getElementById('adm-status').value;
+            if(n && p) {
+                push(ref(db, 'products'), { name: n, price: p, status: s });
+                Swal.fire({ title: 'Success', text: 'VPN Added!', icon: 'success', background: '#161d2f', color: '#fff' });
+                document.getElementById('adm-name').value = '';
+            }
         };
 
-        function getBranding(n) {
-            const name = n.toLowerCase();
-            if(name.includes('express')) return { i: 'fa-bolt', c: '#FF4757', b: '#FFF0F1' };
-            if(name.includes('nord')) return { i: 'fa-shield-halved', c: '#3867D6', b: '#EFF3FF' };
-            return { i: 'fa-globe', c: '#20BF6B', b: '#EBFAF2' };
+        window.modOrder = (id, s) => update(ref(db, `orders/${id}`), { status: s });
+        window.delOrder = (id) => remove(ref(db, `orders/${id}`));
+
+        // ROUTER & MODALS
+        window.router = (p) => {
+            ['page-user', 'page-admin', 'page-orders'].forEach(i => document.getElementById(i).classList.remove('active'));
+            document.getElementById('page-' + p).classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('btn-active', 'text-blue-500'));
+            event.currentTarget.classList.add('btn-active');
+        };
+
+        window.initPay = (id, n, p) => {
+            selectedNode = { name: n, price: p };
+            document.getElementById('pay-modal').style.display = 'flex';
+            document.getElementById('method-grid').classList.remove('hidden');
+            document.getElementById('final-form').classList.add('hidden');
+            document.getElementById('m-title').innerText = "Total: ৳" + p;
+        };
+
+        window.selectGateway = (m) => {
+            selectedNode.gateway = m;
+            document.getElementById('method-grid').classList.add('hidden');
+            document.getElementById('final-form').classList.remove('hidden');
+        };
+
+        window.pushOrder = () => {
+            const t = document.getElementById('trx-id').value;
+            if(!t) return Swal.fire('Error', 'TrxID required!', 'error');
+            push(ref(db, 'orders'), { ...selectedNode, trx: t, status: 'Pending', method: selectedNode.gateway });
+            Swal.fire('Done', 'Order submitted!', 'success');
+            closeModal();
+        };
+
+        window.closeModal = () => document.getElementById('pay-modal').style.display = 'none';
+
+        function hideLoader() {
+            setTimeout(() => {
+                document.getElementById('loader-screen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loader-screen').style.display = 'none';
+                }, 500);
+            }, 1500);
         }
 
-        // 2. USER FUNCTIONS
-        function loadProducts() {
-            db.ref('products').on('value', snap => {
-                const list = document.getElementById('catalog-list'); list.innerHTML = '';
-                snap.forEach(c => {
-                    const p = c.val(); const b = getBranding(p.name);
-                    list.innerHTML += `
-                        <div class="v-card" onclick="openSheet('${p.name}', ${p.p1}, ${p.p2})">
-                            <div class="v-icon" style="background:${b.b}; color:${b.c}"><i class="fa-solid ${b.i}"></i></div>
-                            <div style="flex:1;"><b>${p.name}</b><br><small>Ultra Speed Premium</small></div>
-                            <i class="fa-solid fa-chevron-right" style="color:#ddd"></i>
-                        </div>`;
-                });
-            });
+        if(location.search.includes('admin=true')) {
+            document.getElementById('nav-admin-btn').classList.remove('hidden');
+            document.getElementById('admin-badge').classList.remove('hidden');
         }
-
-        function openSheet(n, p1, p2) {
-            currentOrder = { vpn: n, p1, p2 };
-            document.getElementById('sh-name').innerText = n;
-            document.getElementById('sh-p1').innerText = "৳ " + p1;
-            document.getElementById('sh-p2').innerText = "৳ " + p2;
-            document.getElementById('sheet').classList.remove('hidden');
-        }
-
-        function closeSheet() { document.getElementById('sheet').classList.add('hidden'); }
-
-        function selPlan(p) {
-            currentOrder.selP = p === 1 ? '7 Days' : '30 Days';
-            currentOrder.selRate = p === 1 ? currentOrder.p1 : currentOrder.p2;
-            alert("Plan Selected: " + currentOrder.selP);
-        }
-
-        function pay(method) {
-            if(!currentOrder.selP) return alert("Select Plan First!");
-            const trx = prompt(`Send ৳${currentOrder.selRate} to our ${method} number and enter TrxID:`);
-            if(trx) {
-                db.ref('orders').push({
-                    uid: user.id, uName: user.first_name, vpn: currentOrder.vpn,
-                    plan: currentOrder.selP, rate: currentOrder.selRate, method, trx, status: 'Pending', time: new Date().toLocaleString()
-                });
-                alert("Order Placed Successfully!"); closeSheet();
-            }
-        }
-
-        function tab(t) {
-            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-            document.getElementById('p-'+t).classList.remove('hidden');
-            document.querySelectorAll('.n-tab').forEach(b => b.classList.remove('active'));
-            if(t === 'hist') loadHistory();
-            if(t === 'admin') loadAdminData();
-        }
-
-        function loadHistory() {
-            db.ref('orders').orderByChild('uid').equalTo(user.id).on('value', snap => {
-                const list = document.getElementById('user-orders'); list.innerHTML = '';
-                snap.forEach(c => {
-                    const o = c.val();
-                    const mail = o.creds ? o.creds.split(':')[0] : 'Wait...';
-                    const pass = o.creds ? o.creds.split(':')[1] : 'Wait...';
-                    list.innerHTML += `
-                        <div class="v-card" style="flex-direction:column; align-items:flex-start;">
-                            <div style="display:flex; justify-content:space-between; width:100%;">
-                                <b>${o.vpn} (${o.plan})</b>
-                                <span style="color:var(--p); font-weight:800; font-size:12px;">${o.status}</span>
-                            </div>
-                            <div class="cred-wrap" style="width:100%;">
-                                <div class="cred-box" onclick="copy('${mail}')"><span class="tag">MAIL</span>${mail}</div>
-                                <div class="cred-box" onclick="copy('${pass}')"><span class="tag">PASS</span>${pass}</div>
-                            </div>
-                        </div>`;
-                });
-            });
-        }
-
-        // 3. ADMIN FUNCTIONS
-        function addVPN() {
-            const name = document.getElementById('v-name').value;
-            const p1 = document.getElementById('v-p1').value;
-            const p2 = document.getElementById('v-p2').value;
-            if(name && p1 && p2) {
-                db.ref('products').push({ name, p1, p2 });
-                alert("VPN Added to Management!");
-            }
-        }
-
-        function loadAdminData() {
-            db.ref('orders').on('value', snap => {
-                const list = document.getElementById('admin-orders-list'); list.innerHTML = '';
-                let pendingCount = 0; let totalSales = 0;
-                snap.forEach(c => {
-                    const o = c.val();
-                    if(o.status === 'Pending') {
-                        pendingCount++;
-                        list.innerHTML += `
-                            <div class="v-card" style="flex-direction:column; align-items:flex-start; border-left:5px solid orange;">
-                                <b>${o.uName} (ID: ${o.uid})</b>
-                                <small>${o.vpn} | ${o.plan} | ${o.method} | Trx: ${o.trx}</small>
-                                <input id="inp-${c.key}" class="inp" placeholder="email:pass" style="margin-top:10px;">
-                                <button class="btn-m" style="background:var(--sc);" onclick="deliver('${c.key}')">DELIVER</button>
-                            </div>`;
-                    }
-                    if(o.status === 'Delivered') totalSales += parseInt(o.rate || 0);
-                });
-                document.getElementById('stat-pending').innerText = pendingCount;
-                document.getElementById('stat-total').innerText = "৳ " + totalSales;
-            });
-        }
-
-        function deliver(key) {
-            const val = document.getElementById('inp-'+key).value;
-            if(val) db.ref('orders/'+key).update({ status: 'Delivered', creds: val });
-        }
-
-        function copy(t) { navigator.clipboard.writeText(t); alert("Copied!"); }
     </script>
-</body>
+
+    </body>
 </html>
