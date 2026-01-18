@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Elite VPN Store</title>
+    
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --bg: #F8FAFC;
+            --white: #ffffff;
+            --text-main: #0F172A;
+            --text-sub: #64748B;
+            --border: #F1F5F9;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0; padding: 0;
+            overflow-x: hidden;
+        }
+
+        .container { padding: 20px; padding-bottom: 100px; }
+        .hidden { display: none !important; }
+
+        /* 1. PLAN SHEET DESIGN (LIKE VIDEO) */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+            display: none; align-items: flex-end; z-index: 2000;
+        }
+        .modal-sheet {
+            background: var(--white); width: 100%; border-radius: 30px 30px 0 0;
+            padding: 25px 20px; animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        .plan-item {
+            background: #F8FAFC; border: 1.5px solid var(--border);
+            border-radius: 20px; padding: 18px; margin-bottom: 12px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .plan-item:active { border-color: var(--primary); background: #EEF2FF; }
+
+        /* 2. HISTORY CARD (VIDEO STYLE) */
+        .history-card {
+            background: white; border-radius: 20px; padding: 18px; margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+        }
+        .delivered-info {
+            background: #F8FAFC; border: 1px dashed var(--primary);
+            border-radius: 12px; padding: 12px; margin-top: 15px; position: relative;
+        }
+        .copy-btn { position: absolute; right: 10px; top: 10px; color: var(--primary); font-size: 16px; cursor: pointer; }
+
+        /* 3. HELP TAB DESIGN (VIDEO STYLE) */
+        .help-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .help-card {
+            background: white; border-radius: 20px; padding: 20px; text-align: center;
+            border: 1px solid var(--border); transition: 0.2s;
+        }
+        .help-card:active { transform: scale(0.95); }
+        .help-card i { font-size: 24px; color: var(--primary); margin-bottom: 10px; }
+
+        /* Navigation Bar */
+        .nav-bar {
+            position: fixed; bottom: 15px; left: 15px; right: 15px;
+            height: 70px; background: white; border-radius: 22px;
+            display: flex; justify-content: space-around; align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 1000;
+        }
+        .nav-item { color: #CBD5E1; text-align: center; font-size: 11px; font-weight: 700; cursor: pointer; }
+        .nav-item.active { color: var(--primary); }
+        .nav-item i { font-size: 22px; display: block; margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="page-home">
+            <h2 style="font-weight: 800; font-size: 22px;">Available Services</h2>
+            <div id="product-list"></div>
+        </div>
+
+        <div id="page-history" class="hidden">
+            <h2 style="font-weight: 800; font-size: 22px;">My Orders</h2>
+            <div id="history-list"></div>
+        </div>
+
+        <div id="page-help" class="hidden">
+            <div style="text-align: center; padding: 20px 0;">
+                <div style="width: 70px; height: 70px; background: #EEF2FF; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto;">
+                    <i class="fa-solid fa-circle-question" style="font-size: 30px; color: var(--primary);"></i>
+                </div>
+                <h2 style="margin: 0; font-weight: 800;">Help Center</h2>
+                <p style="color: var(--text-sub); font-size: 14px;">How can we help you today?</p>
+            </div>
+
+            <div class="help-grid">
+                <div class="help-card" onclick="window.location.href='https://t.me/NibDeveloper'">
+                    <i class="fa-solid fa-headset"></i>
+                    <div style="font-weight: 700;">Chat Admin</div>
+                </div>
+                <div class="help-card" onclick="window.location.href='https://t.me/your_channel'">
+                    <i class="fa-brands fa-telegram"></i>
+                    <div style="font-weight: 700;">Channel</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="plan-modal" class="modal-overlay" onclick="closePlan()">
+        <div class="modal-sheet" onclick="event.stopPropagation()">
+            <div style="width: 40px; height: 5px; background: #E2E8F0; border-radius: 10px; margin: 0 auto 20px auto;"></div>
+            <h3 id="v-name" style="margin: 0; font-weight: 800;">Express VPN</h3>
+            <p style="color: var(--text-sub); font-size: 13px; margin-bottom: 25px;">Choose your subscription plan</p>
+
+            <div class="plan-item" onclick="orderNow('7 Days')">
+                <div>
+                    <div style="font-weight: 700; font-size: 16px;">7 Days</div>
+                    <div style="font-size: 12px; color: var(--text-sub);">Warranty Included</div>
+                </div>
+                <div style="font-weight: 800; color: var(--primary);">৳ <span id="v-rate-1">45</span></div>
+            </div>
+
+            <div class="plan-item" onclick="orderNow('30 Days')">
+                <div>
+                    <div style="font-weight: 700; font-size: 16px;">30 Days</div>
+                    <div style="font-size: 12px; color: var(--text-sub);">Warranty Included</div>
+                </div>
+                <div style="font-weight: 800; color: var(--primary);">৳ <span id="v-rate-2">105</span></div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="nav-bar">
+        <div class="nav-item active" id="n-home" onclick="nav('home')"><i class="fa-solid fa-shop"></i>Store</div>
+        <div class="nav-item" id="n-history" onclick="nav('history')"><i class="fa-solid fa-clock-rotate-left"></i>Orders</div>
+        <div class="nav-item" id="n-help" onclick="nav('help')"><i class="fa-solid fa-circle-info"></i>Help</div>
+    </nav>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDZQHw4-DdUdDmJXcuK_88JrJxv35FfYeY",
+            authDomain: "vpn-store-s26x.firebaseapp.com",
+            databaseURL: "https://vpn-store-s26x-default-rtdb.firebaseio.com",
+            projectId: "vpn-store-s26x",
+            storageBucket: "vpn-store-s26x.firebasestorage.app",
+            messagingSenderId: "373050662329",
+            appId: "1:373050662329:web:b3d02424ef0986d6abea68"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const tg = window.Telegram.WebApp;
+        const user = tg.initDataUnsafe.user || { id: 8505710811, first_name: "Admin" };
+        let currentVpn = null;
+
+        function nav(p) {
+            document.querySelectorAll('.container > div').forEach(d => d.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById('page-'+p).classList.remove('hidden');
+            document.getElementById('n-'+p).classList.add('active');
+            if(p === 'history') loadHistory();
+        }
+
+        function openPlan(name, rate) {
+            currentVpn = { name, rate };
+            document.getElementById('v-name').innerText = name;
+            document.getElementById('v-rate-1').innerText = rate;
+            document.getElementById('v-rate-2').innerText = Math.round(rate * 2.3);
+            document.getElementById('plan-modal').style.display = 'flex';
+        }
+
+        function closePlan() { document.getElementById('plan-modal').style.display = 'none'; }
+
+        function loadHistory() {
+            db.ref('orders').orderByChild('uid').equalTo(user.id).on('value', snap => {
+                const list = document.getElementById('history-list');
+                list.innerHTML = '';
+                snap.forEach(c => {
+                    const o = c.val();
+                    list.innerHTML += `
+                        <div class="history-card">
+                            <div style="display:flex; justify-content:space-between;">
+                                <div style="font-weight:800;">${o.vpn} - ${o.plan}</div>
+                                <div style="color:${o.status==='Delivered'?'#10B981':'#F59E0B'}; font-size:12px; font-weight:800;">${o.status}</div>
+                            </div>
+                            <div style="font-size:11px; color:var(--text-sub); margin-top:5px;">TrxID: ${o.trx}</div>
+                            ${o.creds ? `
+                                <div class="delivered-info">
+                                    <div style="font-size:12px; color:var(--text-sub);">LOGIN DETAILS</div>
+                                    <div style="font-family:monospace; margin-top:5px;">${o.creds}</div>
+                                    <i class="fa-solid fa-copy copy-btn" onclick="navigator.clipboard.writeText('${o.creds}')"></i>
+                                </div>` : ''}
+                        </div>`;
+                });
+            });
+        }
+
+        // --- Load products logic would go here ---
+        nav('home');
+    </script>
+</body>
+</html>
