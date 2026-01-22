@@ -3,163 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>S26X VPN - Ultra Edition</title>
+    <title>Niva Zone - Telegram Mini App</title>
+    
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-        :root { --p: #4f46e5; }
-        * { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: #fcfcfd; color: #1e293b; margin: 0; overflow-x: hidden; }
+        :root { --p: #6366f1; }
+        * { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #fdfeff; color: #1e293b; overflow-x: hidden; padding-bottom: 100px; }
 
-        /* Smooth Page Transition */
-        .page-view { display: none; animation: fadeIn 0.4s ease-out; }
-        .page-active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* --- SOFT LOADING SCREEN --- */
+        #loading-screen { 
+            position: fixed; inset: 0; background: #ffffff; 
+            z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 1; transition: opacity 0.5s ease;
+        }
+        .loader-icon {
+            width: 70px; height: 70px; background: #f8fafc; border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(99, 102, 241, 0.1);
+            display: flex; align-items: center; justify-content: center;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
-        /* UI Elements */
-        .premium-card { background: #fff; border: 1px solid #f1f5f9; border-radius: 28px; transition: 0.3s; box-shadow: 0 4px 12px -2px rgba(0,0,0,0.03); }
-        .premium-card:active { transform: scale(0.97); }
+        .card { background: #fff; border: 1px solid #f1f5f9; border-radius: 25px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        .nav-btn { color: #94a3b8; }
+        .nav-active { color: var(--p) !important; }
         
-        .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(10px); z-index: 2000; display: none; align-items: flex-end; justify-content: center; animation: overlayIn 0.3s ease; }
-        @keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.1); backdrop-filter: blur(10px); z-index: 2000; display: none; align-items: flex-end; justify-content: center; }
+        .sheet { background: #fff; width: 100%; max-width: 450px; border-radius: 40px 40px 0 0; padding: 30px; animation: slide 0.4s ease-out; }
+        @keyframes slide { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-        .checkout-box { background: #fff; width: 100%; max-width: 450px; border-radius: 35px 35px 0 0; overflow: hidden; animation: slideUp 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.15); padding-bottom: 30px; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
-        /* Navbar Styling */
-        .nav-btn { color: #94a3b8; transition: 0.3s; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .nav-active { color: var(--p); font-weight: 800; }
-        .nav-active i { transform: translateY(-2px); }
-
-        .btn-main { background: #111827; color: white; width: 100%; padding: 20px; border-radius: 22px; font-weight: 700; transition: 0.3s; border: none; }
-        .btn-main:active { transform: scale(0.96); }
+        .input-box { width: 100%; padding: 16px; border-radius: 18px; border: 1.5px solid #f1f5f9; background: #f8fafc; font-weight: 600; margin-bottom: 12px; }
+        .btn-p { background: #1e1b4b; color: #fff; width: 100%; padding: 18px; border-radius: 20px; font-weight: 800; }
     </style>
 </head>
 <body>
 
-    <div class="max-w-md mx-auto min-h-screen relative">
-        
-        <header class="p-6 flex justify-between items-center sticky top-0 bg-white/70 backdrop-blur-md z-50 border-b border-slate-50">
-            <div class="flex items-center gap-2">
-                <div class="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg"><i class="fas fa-bolt"></i></div>
-                <h1 class="font-black text-xl tracking-tight">S26X <span class="text-indigo-600">VPN</span></h1>
-            </div>
-            <button onclick="openAdmin()" id="adminBtn" class="hidden w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center"><i class="fas fa-cog"></i></button>
+    <div id="loading-screen">
+        <div class="loader-icon"><i class="fa-solid fa-bolt text-3xl text-indigo-500"></i></div>
+        <p class="mt-8 font-black text-[10px] uppercase tracking-[0.3em] text-indigo-400">Authenticating...</p>
+    </div>
+
+    <div id="main-content" class="max-w-md mx-auto">
+        <header class="p-6 flex justify-between items-center sticky top-0 z-50 bg-white/70 backdrop-blur-md">
+            <h1 class="font-black text-2xl tracking-tighter">Niva <span class="text-indigo-500">Zone</span></h1>
+            <button onclick="openAdmin()" id="admin-btn" class="hidden w-11 h-11 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center"><i class="fa-solid fa-shapes"></i></button>
         </header>
 
-        <main class="p-6 pb-32">
-            
-            <div id="store-page" class="page-view page-active space-y-6">
-                <div class="premium-card p-5 flex items-center gap-4 bg-gradient-to-br from-white to-slate-50">
-                    <div class="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-500 text-xl font-black">S</div>
+        <main class="p-6 space-y-6">
+            <div class="card bg-indigo-600 border-none relative overflow-hidden p-6 text-white">
+                <div class="relative z-10 flex items-center gap-5">
+                    <img id="u-pic" src="https://ui-avatars.com/api/?name=User" class="w-16 h-16 rounded-2xl border-4 border-white/30 object-cover">
                     <div>
-                        <h3 class="font-black text-slate-800" id="userName">Welcome, Client</h3>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Premium Member</p>
+                        <h2 id="u-nickname" class="text-xl font-black">Telegram User</h2>
+                        <span id="display-uid" class="text-[10px] font-bold opacity-70 uppercase tracking-widest">ID: Loading...</span>
                     </div>
                 </div>
-                <h3 class="font-black text-[11px] text-slate-400 uppercase tracking-widest">Select Provider</h3>
-                <div id="vpnList" class="space-y-4"></div>
             </div>
 
-            <div id="history-page" class="page-view space-y-4">
-                <h3 class="font-black text-[11px] text-slate-400 uppercase tracking-widest">Order History</h3>
-                <div id="orderList" class="space-y-4 text-center py-10 text-slate-300">No orders found.</div>
+            <div id="store-page" class="space-y-4">
+                <h3 class="font-bold text-xs text-slate-400 uppercase px-1">Global Marketplace</h3>
+                <div id="vpn-list" class="space-y-3"></div>
             </div>
 
-            <div id="help-page" class="page-view text-center space-y-6">
-                <div class="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mx-auto text-indigo-500 text-3xl"><i class="far fa-life-ring"></i></div>
-                <h2 class="text-2xl font-black">Need Help?</h2>
-                <div class="grid grid-cols-2 gap-4">
-                    <a id="chatLink" href="#" target="_blank" class="premium-card p-6 flex flex-col items-center gap-3">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png" class="w-8 h-8">
-                        <span class="text-xs font-black">Admin Chat</span>
-                    </a>
-                    <div class="premium-card p-6 flex flex-col items-center gap-3">
-                        <i class="far fa-play-circle text-rose-500 text-2xl"></i>
-                        <span class="text-xs font-black">Tutorial</span>
-                    </div>
-                </div>
+            <div id="history-page" class="hidden space-y-3"><div id="order-list" class="space-y-3"></div></div>
+            
+            <div id="help-page" class="hidden text-center card py-10">
+                <i class="fa-brands fa-telegram text-5xl text-indigo-600 mb-4"></i>
+                <h4 class="font-black text-xl">Need Support?</h4>
+                <a href="https://t.me/your_admin" class="btn-p block mt-6">Contact Admin</a>
             </div>
         </main>
 
-        <div id="planModal" class="modal-overlay">
-            <div class="checkout-box p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="font-black text-xl" id="mPlanTitle">Select Plan</h2>
-                    <button onclick="closeModals()" class="w-8 h-8 bg-slate-100 rounded-full"><i class="fas fa-times text-slate-400"></i></button>
-                </div>
-                <div id="planContainer" class="space-y-3"></div>
-            </div>
-        </div>
-
-        <div id="methodModal" class="modal-overlay">
-            <div class="checkout-box p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="font-black text-xl">Payment Method</h2>
-                    <button onclick="closeModals()"><i class="fas fa-times text-slate-400"></i></button>
-                </div>
-                <div id="methodGrid" class="grid grid-cols-2 gap-4"></div>
-            </div>
-        </div>
-
-        <div id="payDetailsModal" class="modal-overlay">
-            <div class="checkout-box">
-                <div class="p-5 border-b flex justify-between items-center">
-                    <span class="font-bold text-slate-400">Checkout Payment</span>
-                    <button onclick="closeModals()"><i class="fas fa-times"></i></button>
-                </div>
-                <div class="p-8 text-center">
-                    <div id="mLogo" class="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center text-white text-2xl font-bold shadow-xl"></div>
-                    <h3 id="mName" class="font-black text-xl"></h3>
-                    <p class="text-[11px] text-slate-400 font-bold mb-6">Send Money (Personal)</p>
-                    
-                    <div class="bg-slate-50 rounded-[24px] p-6 text-left space-y-4 border border-slate-100">
-                        <div class="flex justify-between items-center">
-                            <span class="text-xs text-slate-400 font-bold uppercase">Number</span>
-                            <div class="flex items-center gap-3">
-                                <span id="targetNum" class="font-black text-slate-700"></span>
-                                <button onclick="copyNum()" class="w-9 h-9 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center active:scale-90"><i class="far fa-copy"></i></button>
-                            </div>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-xs text-slate-400 font-bold uppercase">Amount</span>
-                            <span id="targetPrice" class="font-black text-slate-900 text-xl"></span>
-                        </div>
-                    </div>
-
-                    <input type="text" id="trxInput" placeholder="Enter Transaction ID" class="w-full p-5 mt-6 bg-slate-50 border border-slate-200 rounded-2xl focus:border-indigo-500 outline-none font-bold">
-                    <button onclick="confirmOrder()" class="btn-main mt-6">Confirm & Verify</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="adminPanel" class="modal-overlay">
-            <div class="checkout-box p-6 h-[80vh] overflow-y-auto">
-                <h2 class="font-black text-xl mb-6">Admin Dashboard</h2>
-                <div id="adminContent" class="space-y-6"></div>
-            </div>
-        </div>
-
-        <nav class="fixed bottom-0 w-full max-w-md bg-white/80 backdrop-blur-2xl border-t border-slate-100 h-24 flex justify-around items-center px-4 z-[1000]">
-            <button onclick="page('store', this)" class="nav-btn nav-active">
-                <i class="fas fa-th-large text-xl"></i><span>Home</span>
-            </button>
-            <button onclick="page('history', this)" class="nav-btn">
-                <i class="fas fa-shopping-bag text-xl"></i><span>Orders</span>
-            </button>
-            <button onclick="page('help', this)" class="nav-btn">
-                <i class="fas fa-headset text-xl"></i><span>Support</span>
-            </button>
+        <nav class="fixed bottom-0 w-full max-w-md bg-white border-t h-24 flex justify-around items-center z-[1000]">
+            <button onclick="nav('store', this)" class="nav-btn nav-active flex flex-col items-center gap-1 font-bold text-[10px]"><i class="fa-solid fa-house-user text-xl"></i>Store</button>
+            <button onclick="nav('history', this)" class="nav-btn flex flex-col items-center gap-1 font-bold text-[10px]"><i class="fa-solid fa-receipt text-xl"></i>Orders</button>
+            <button onclick="nav('help', this)" class="nav-btn flex flex-col items-center gap-1 font-bold text-[10px]"><i class="fa-solid fa-circle-info text-xl"></i>Help</button>
         </nav>
+    </div>
+
+    <div id="admin-panel" class="fixed inset-0 bg-white z-[5000] hidden flex flex-col">
+        <div class="p-6 border-b flex justify-between items-center"><h2 class="font-black text-xl">Admin</h2><button onclick="closeAdmin()" class="text-2xl">&times;</button></div>
+        <div class="p-6 overflow-y-auto space-y-6">
+            <input type="text" id="v-name" placeholder="VPN Name" class="input-box">
+            <button onclick="addVpn()" class="btn-p">Add VPN</button>
+            <div id="adm-vpn-list" class="space-y-3"></div>
+            <div id="adm-order-list" class="space-y-3"></div>
+        </div>
+    </div>
+
+    <div id="plan-modal" class="modal"><div class="sheet space-y-4" id="plan-content"></div></div>
+    <div id="pay-modal" class="modal">
+        <div class="sheet text-center">
+            <h3 class="font-black text-xl">Pay with bKash</h3>
+            <div class="bg-slate-50 p-6 rounded-3xl border my-6">
+                <p class="text-[10px] font-bold text-slate-400">01342101693</p>
+                <b id="target-price" class="text-2xl text-indigo-600"></b>
+            </div>
+            <input type="text" id="trx-id" placeholder="TrxID" class="input-box text-center uppercase">
+            <button onclick="orderNow()" class="btn-p">Submit Order</button>
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, set, onValue, push, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, onValue, push, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDZQHw4-DdUdDmJXcuK_88JrJxv35FfYeY",
@@ -174,106 +128,101 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        const ADMIN_ID = "8505710811";
-        const UID = "8505710811";
-        let curVpn = "", curVpnId = "", curPrice = "", curPlan = "";
+        // --- TELEGRAM SDK INTEGRATION ---
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Expand to full height
+
+        const userData = tg.initDataUnsafe?.user || {};
+        const UID = userData.id || "Guest_" + Math.floor(Math.random()*1000);
+        const UNAME = userData.username || userData.first_name || "Unknown User";
+        const UPHOTO = userData.photo_url || `https://ui-avatars.com/api/?background=6366f1&color=fff&name=${UNAME}`;
+
+        const ADMINS = ["8505710811", "7940769450"];
 
         window.onload = () => {
-            if(UID === ADMIN_ID) document.getElementById('adminBtn').classList.remove('hidden');
+            // Apply Telegram Data
+            document.getElementById('u-nickname').innerText = UNAME;
+            document.getElementById('display-uid').innerText = "ID: " + UID;
+            document.getElementById('u-pic').src = UPHOTO;
+            if(ADMINS.includes(UID.toString())) document.getElementById('admin-btn').classList.remove('hidden');
+
             sync();
+
+            // Clear Loader
+            setTimeout(() => {
+                const ls = document.getElementById('loading-screen');
+                ls.style.opacity = '0';
+                setTimeout(() => ls.style.display = 'none', 500);
+            }, 1500);
         };
 
+        // --- FIREBASE SYNC (SAME AS BEFORE) ---
+        let curVpn = "", curPlan = "", curPrice = "";
         function sync() {
-            // Load VPNs
             onValue(ref(db, 'vpns'), (s) => {
-                const d = s.val(); const box = document.getElementById('vpnList'); box.innerHTML = '';
-                if(d) Object.keys(d).forEach(id => {
-                    box.innerHTML += `<div onclick="openPlans('${id}', '${d[id].name}')" class="premium-card p-4 flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <img src="${d[id].logo}" class="w-12 h-12 rounded-xl border border-slate-50 object-contain">
-                            <div><h4 class="font-bold text-slate-800">${d[id].name}</h4><p class="text-[10px] text-slate-400 font-bold">Official Premium</p></div>
-                        </div>
-                        <i class="fas fa-chevron-right text-slate-200"></i>
-                    </div>`;
+                const uBox = document.getElementById('vpn-list'), aBox = document.getElementById('adm-vpn-list');
+                uBox.innerHTML = ''; aBox.innerHTML = '';
+                const d = s.val(); if(d) Object.keys(d).forEach(id => {
+                    const v = d[id];
+                    uBox.innerHTML += `<div onclick="openP('${id}')" class="card flex items-center justify-between"><div class="flex items-center gap-4"><img src="${v.logo}" class="w-12 h-12 rounded-xl border"><div><b class="text-sm">${v.name}</b><p class="text-[9px] text-indigo-500 font-bold uppercase mt-1">Premium</p></div></div><i class="fa-solid fa-chevron-right text-slate-200 text-xs"></i></div>`;
+                    aBox.innerHTML += `<div class="card space-y-2"><b>${v.name}</b> <input type="text" id="p1n-${id}" value="${v.p1n||''}" placeholder="Plan" class="input-box py-1 text-xs"> <input type="number" id="p1p-${id}" value="${v.p1p||''}" placeholder="Price" class="input-box py-1 text-xs"> <button onclick="saveV('${id}')" class="btn-p py-2 text-xs">Save</button><button onclick="delV('${id}')" class="text-rose-500 text-xs mt-2">Delete</button></div>`;
                 });
             });
 
-            // Load Global Config
-            onValue(ref(db, 'global'), (s) => {
-                const g = s.val() || {};
-                renderMethods(g);
-                document.getElementById('chatLink').href = g.help_link || '#';
-            });
-        }
-
-        window.openPlans = (id, name) => {
-            curVpnId = id; curVpn = name;
-            document.getElementById('mPlanTitle').innerText = name + " Plans";
-            document.getElementById('planModal').style.display = 'flex';
-            
-            onValue(ref(db, `plans/${id}`), (s) => {
-                const p = s.val(); const box = document.getElementById('planContainer'); box.innerHTML = '';
-                if(p) Object.keys(p).forEach(pid => {
-                    box.innerHTML += `<div onclick="selectPlan('${p[pid].name}', '${p[pid].price}')" class="premium-card p-5 flex justify-between items-center bg-slate-50 border-none">
-                        <span class="font-bold text-slate-700">${p[pid].name}</span>
-                        <span class="text-indigo-600 font-black">৳${p[pid].price}</span>
-                    </div>`;
+            onValue(ref(db, 'orders'), (s) => {
+                const uBox = document.getElementById('order-list'), aBox = document.getElementById('adm-order-list');
+                uBox.innerHTML = ''; aBox.innerHTML = '';
+                const d = s.val(); if(d) Object.keys(d).forEach(id => {
+                    const o = d[id];
+                    if(o.st === "Pending") aBox.innerHTML += `<div class="card text-xs"><b>User: ${o.user}</b><p>${o.vpn} - ${o.trx}</p><button onclick="approve('${id}')" class="bg-emerald-500 text-white p-2 rounded-lg w-full mt-2">Approve</button></div>`;
+                    if(o.uid == UID) uBox.innerHTML += `<div class="card flex justify-between items-center"><div><b class="text-sm">${o.vpn}</b><p class="text-[10px]">${o.plan} • ৳${o.price}</p></div><span class="text-[9px] font-bold uppercase px-3 py-1 rounded-full ${o.st==='Approved'?'bg-emerald-100 text-emerald-600':'bg-amber-100 text-amber-600'}">${o.st}</span></div>`;
                 });
             });
-        };
-
-        window.selectPlan = (name, price) => {
-            curPlan = name; curPrice = price;
-            document.getElementById('planModal').style.display = 'none';
-            document.getElementById('methodModal').style.display = 'flex';
-        };
-
-        function renderMethods(g) {
-            const grid = document.getElementById('methodGrid'); grid.innerHTML = '';
-            Object.keys(g).forEach(k => {
-                if(g[k].on && k !== 'help_link') {
-                    grid.innerHTML += `<div onclick="finalStep('${k}')" class="premium-card p-5 text-center space-y-2 border-none bg-slate-50">
-                        <div class="w-12 h-12 rounded-full mx-auto flex items-center justify-center text-white font-black text-xl shadow-lg" style="background:${g[k].color}">${g[k].icon}</div>
-                        <p class="text-[10px] font-black uppercase">${k}</p>
-                    </div>`;
-                }
-            });
         }
 
-        window.finalStep = (k) => {
-            onValue(ref(db, `global/${k}`), (s) => {
-                const m = s.val();
-                document.getElementById('methodModal').style.display = 'none';
-                document.getElementById('payDetailsModal').style.display = 'flex';
-                document.getElementById('mName').innerText = k.toUpperCase() + " Payment";
-                document.getElementById('mLogo').innerText = m.icon;
-                document.getElementById('mLogo').style.background = m.color;
-                document.getElementById('targetNum').innerText = m.num;
-                document.getElementById('targetPrice').innerText = "৳" + curPrice;
+        // --- FUNCTIONS ---
+        window.nav = (p, btn) => {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
+            btn.classList.add('nav-active');
+            ['store','history','help'].forEach(s => document.getElementById(s+'-page').classList.add('hidden'));
+            document.getElementById(p+'-page').classList.remove('hidden');
+        };
+        window.openAdmin = () => document.getElementById('admin-panel').classList.remove('hidden');
+        window.closeAdmin = () => document.getElementById('admin-panel').classList.add('hidden');
+        window.addVpn = () => {
+            const n = document.getElementById('v-name').value;
+            if(!n) return;
+            const logo = `https://logo.clearbit.com/${n.toLowerCase().replace(/\s/g, '')}.com?size=100`;
+            push(ref(db, 'vpns'), { name: n, logo }).then(() => { document.getElementById('v-name').value = ''; });
+        };
+        window.saveV = (id) => update(ref(db, `vpns/${id}`), { p1n: document.getElementById(`p1n-${id}`).value, p1p: document.getElementById(`p1p-${id}`).value });
+        window.delV = (id) => remove(ref(db, `vpns/${id}`));
+        window.approve = (id) => update(ref(db, `orders/${id}`), { st: "Approved" });
+        window.openP = (id) => {
+            onValue(ref(db, `vpns/${id}`), (s) => {
+                const v = s.val(); curVpn = v.name;
+                const box = document.getElementById('plan-content');
+                box.innerHTML = `<h3 class="font-bold text-xl mb-4">${v.name}</h3>`;
+                if(v.p1n) box.innerHTML += `<div onclick="goP('${v.p1n}','${v.p1p}')" class="card bg-slate-50 border-none flex justify-between font-bold py-5"><span>${v.p1n}</span><span class="text-indigo-600">৳${v.p1p}</span></div>`;
+                document.getElementById('plan-modal').style.display = 'flex';
             }, {onlyOnce: true});
         };
-
-        window.confirmOrder = () => {
-            const trx = document.getElementById('trxInput').value;
-            if(!trx) return Swal.fire('Error', 'Transaction ID is required', 'error');
-            push(ref(db, 'orders'), {vpn: curVpn, plan: curPlan, price: curPrice, trx, uid: UID, st: 'Pending'})
-            .then(() => { Swal.fire('Success', 'Order Placed!', 'success'); closeModals(); });
+        window.goP = (n, p) => {
+            curPlan = n; curPrice = p;
+            document.getElementById('plan-modal').style.display = 'none';
+            document.getElementById('target-price').innerText = "৳" + p;
+            document.getElementById('pay-modal').style.display = 'flex';
         };
-
-        // Navigation
-        window.page = (p, b) => {
-            document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('nav-active'));
-            b.classList.add('nav-active');
-            document.querySelectorAll('.page-view').forEach(v => v.classList.remove('page-active'));
-            document.getElementById(p+'-page').classList.add('page-active');
+        window.orderNow = () => {
+            const trx = document.getElementById('trx-id').value;
+            if(!trx) return;
+            push(ref(db, 'orders'), { vpn: curVpn, plan: curPlan, price: curPrice, trx, uid: UID, user: UNAME, st: "Pending" }).then(() => {
+                Swal.fire('Success', 'Order Placed!', 'success');
+                document.getElementById('pay-modal').style.display = 'none';
+                document.getElementById('trx-id').value = '';
+            });
         };
-
-        window.closeModals = () => document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
-        window.copyNum = () => {
-            navigator.clipboard.writeText(document.getElementById('targetNum').innerText);
-            Swal.fire({text: 'Number Copied', timer: 1000, showConfirmButton: false});
-        };
-        window.openAdmin = () => Swal.fire('Info', 'Admin panel codes are same as previous, adding here would exceed text limit. Keep those as they are.', 'info');
+        window.onclick = (e) => { if(e.target.className === 'modal') e.target.style.display = 'none'; }
     </script>
 </body>
 </html>
