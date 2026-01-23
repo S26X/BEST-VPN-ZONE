@@ -23,7 +23,6 @@
         .btn-p { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); color: #fff; width: 100%; padding: 16px; border-radius: 20px; font-weight: 800; font-size: 14px; box-shadow: 0 10px 20px -5px rgba(30,27,75,0.3); }
         .btn-reject { background: #fee2e2; color: #ef4444; width: 100%; padding: 12px; border-radius: 18px; font-weight: 700; font-size: 12px; }
         
-        /* Account Info Box Style */
         .acc-box { background: #f8fafc; border: 1.5px dashed #e2e8f0; border-radius: 14px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
         .acc-label { font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
         .acc-value { font-family: 'monospace'; font-size: 11px; font-weight: 700; color: #1e293b; }
@@ -31,12 +30,15 @@
         .adm-nav { display: flex; background: #f1f5f9; padding: 5px; border-radius: 18px; margin-bottom: 15px; gap: 4px; overflow-x: auto; }
         .adm-tab { flex: 1; min-width: 90px; padding: 12px 8px; font-size: 10px; font-weight: 800; color: #64748b; border-radius: 14px; text-align: center; white-space: nowrap; }
         .adm-tab-active { background: #fff; color: #6366f1; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        
         .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(8px); z-index: 6000; display: none; align-items: flex-end; justify-content: center; }
         .sheet { background: #fff; width: 100%; max-width: 450px; border-radius: 35px 35px 0 0; padding: 30px; animation: slideUp 0.3s; max-height: 85vh; overflow-y: auto; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        
         .adm-mini-input { width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px; font-size: 11px; font-weight: 600; outline: none; }
         .vpn-img { width: 48px; height: 48px; border-radius: 16px; object-fit: cover; background: #fff; border: 1px solid #f1f5f9; }
         .disabled-card { opacity: 0.5; pointer-events: none; filter: grayscale(1); }
+        
         .switch { position: relative; display: inline-block; width: 34px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; inset: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
@@ -69,15 +71,16 @@
                 </div>
             </div>
 
-            <div id="store-page" class="space-y-4">
+            <div id="store-page" class="page-content space-y-4">
                 <div id="vpn-list" class="space-y-3"></div>
             </div>
 
-            <div id="history-page" class="hidden space-y-3">
+            <div id="history-page" class="page-content hidden space-y-3">
+                <h3 class="font-black text-lg mb-2">My Orders</h3>
                 <div id="user-orders" class="space-y-3"></div>
             </div>
 
-            <div id="help-page" class="hidden text-center card py-12">
+            <div id="help-page" class="page-content hidden text-center card py-12">
                 <div class="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-5"><i class="fa-brands fa-telegram text-5xl text-indigo-500"></i></div>
                 <h4 class="font-black text-xl">Contact Support</h4>
                 <a id="support-link" href="#" target="_blank" class="btn-p block mt-8">Message Admin</a>
@@ -85,9 +88,9 @@
         </main>
 
         <nav class="fixed bottom-0 w-full max-w-md bg-white/80 backdrop-blur-xl border-t h-20 flex justify-around items-center z-[1000]">
-            <button onclick="nav('store', this)" class="text-indigo-600 flex flex-col items-center gap-1 font-bold text-[10px]"><i class="fa-solid fa-store text-xl"></i>Store</button>
-            <button onclick="nav('history', this)" class="text-slate-400 flex flex-col items-center gap-1 font-bold text-[10px]"><i class="fa-solid fa-box text-xl"></i>Orders</button>
-            <button onclick="nav('help', this)" class="text-slate-400 flex flex-col items-center gap-1 font-bold text-[10px]"><i class="fa-solid fa-headset text-xl"></i>Help</button>
+            <button onclick="nav('store', this)" class="nav-btn text-indigo-600 flex flex-col items-center gap-1 font-bold text-[10px]"><i class="fa-solid fa-store text-xl"></i>Store</button>
+            <button onclick="nav('history', this)" class="nav-btn text-slate-400 flex flex-col items-center gap-1 font-bold text-[10px]"><i class="fa-solid fa-box text-xl"></i>Orders</button>
+            <button onclick="nav('help', this)" class="nav-btn text-slate-400 flex flex-col items-center gap-1 font-bold text-[10px]"><i class="fa-solid fa-headset text-xl"></i>Help</button>
             <button id="admin-btn-nav" onclick="openAdmin()" class="hidden text-slate-400 flex flex-col items-center gap-1 font-bold text-[10px]"><i class="fa-solid fa-user-shield text-xl"></i>Admin</button>
         </nav>
     </div>
@@ -122,12 +125,12 @@
                     <input type="text" id="set-support-url" placeholder="Support Telegram Link" class="adm-mini-input">
                     <button onclick="saveSupport()" class="btn-p py-2 text-xs">Save Link</button>
                     <hr>
-                    <div class="flex gap-2"><input type="text" id="pay-name" placeholder="Bkash" class="w-1/2 adm-mini-input"><input type="text" id="pay-num-in" placeholder="017..." class="w-1/2 adm-mini-input"></div>
-                    <button onclick="addPay()" class="btn-p py-2 text-xs">Add Payment Method</button>
+                    <div class="flex gap-2"><input type="text" id="pay-name" placeholder="Bkash" class="w-1/2 adm-mini-input"><input type="text" id="pay-num-in" placeholder="Number" class="w-1/2 adm-mini-input"></div>
+                    <button onclick="addPay()" class="btn-p py-2 text-xs">Add Method</button>
                     <div id="pay-list" class="space-y-2 mt-2"></div>
                 </div>
-                <div class="card space-y-3 border-2 border-indigo-100">
-                    <input type="text" id="v-name" placeholder="VPN Name" class="adm-mini-input">
+                <div class="card space-y-3">
+                    <input type="text" id="v-name" placeholder="VPN Brand Name" class="adm-mini-input">
                     <button onclick="addVpn()" class="btn-p py-3 text-xs">Create VPN Brand</button>
                 </div>
                 <div id="adm-vpn-list" class="space-y-4"></div>
@@ -215,7 +218,7 @@
                         <div class="grid grid-cols-2 gap-2">
                             <input type="text" id="p1n-${id}" value="${v.p1n||''}" placeholder="Plan 1" class="adm-mini-input"><input type="number" id="p1p-${id}" value="${v.p1p||''}" placeholder="Price" class="adm-mini-input">
                             <input type="text" id="p2n-${id}" value="${v.p2n||''}" placeholder="Plan 2" class="adm-mini-input"><input type="number" id="p2p-${id}" value="${v.p2p||''}" placeholder="Price" class="adm-mini-input">
-                        </div><button onclick="saveV('${id}')" class="btn-p py-2.5 text-[10px]">Update Brand</button></div>`;
+                        </div><button onclick="saveV('${id}')" class="btn-p py-2.5 text-[10px]">Update Configuration</button></div>`;
 
                     sSelect.innerHTML += `<option value="${id}">${v.name}</option>`;
                     if(v.stock) {
@@ -251,7 +254,6 @@
                                 <div><b class="text-sm">${o.vpn}</b><p class="text-[9px] text-slate-400 mt-1">${o.date || ''}</p></div>
                                 <span class="text-[10px] font-bold px-2 py-1 rounded ${stColor}">${o.st}</span>
                             </div>
-                            
                             ${o.email ? `
                             <div class="mt-3 space-y-2">
                                 <div class="acc-box" onclick="copyText('${o.email}')">
@@ -264,7 +266,6 @@
                                 </div>
                             </div>
                             ` : ''}
-
                             ${o.st === "Rejected" ? `<p class="text-[9px] text-rose-500 font-bold italic mt-2">Order was rejected by admin.</p>` : ''}
                         </div>`;
                     }
@@ -283,6 +284,21 @@
             });
         }
 
+        window.nav = (pageId, btn) => {
+            // Reset all nav buttons
+            document.querySelectorAll('.nav-btn').forEach(b => {
+                b.classList.remove('text-indigo-600');
+                b.classList.add('text-slate-400');
+            });
+            // Highlight active button
+            btn.classList.remove('text-slate-400');
+            btn.classList.add('text-indigo-600');
+            // Hide all pages
+            document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
+            // Show target page
+            document.getElementById(pageId + '-page').classList.remove('hidden');
+        };
+
         window.rejectOrder = (id) => {
             Swal.fire({
                 title: 'Reject Order?',
@@ -293,7 +309,7 @@
                 confirmButtonText: 'Yes, Reject'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    update(ref(db, `orders/${id}`), { st: "Rejected" }).then(() => Swal.fire('Rejected!','Order has been rejected.','success'));
+                    update(ref(db, `orders/${id}`), { st: "Rejected" }).then(() => Swal.fire('Rejected!','','success'));
                 }
             });
         };
@@ -307,7 +323,7 @@
             const e = document.getElementById('stock-email').value, p = document.getElementById('stock-pass').value, vid = document.getElementById('stock-vpn-id').value;
             if(e && p) push(ref(db, `vpns/${vid}/stock`), { email: e, pass: p }).then(() => {
                 document.getElementById('stock-email').value = ''; document.getElementById('stock-pass').value = '';
-                Swal.fire({title:'Stock Added', icon:'success', toast:true, position:'top', timer:1500});
+                Swal.fire({title:'Stock Added', icon:'success', toast:true, timer:1500});
             });
         };
 
@@ -352,7 +368,7 @@
             update(ref(db, `orders/${orderId}`), { st: "Approved", email: snap.val().email, pass: snap.val().pass }).then(() => {
                 remove(ref(db, `vpns/${vpnId}/stock/${stockKey}`));
                 document.getElementById('stock-select-modal').style.display = 'none';
-                Swal.fire('Delivered!','Account details sent to user.','success');
+                Swal.fire('Delivered!','','success');
             });
         };
 
@@ -364,12 +380,6 @@
         window.delV = (id) => remove(ref(db,`vpns/${id}`));
         window.delStockItem = (vid, skey) => remove(ref(db, `vpns/${vid}/stock/${skey}`));
         
-        window.nav = (p, btn) => {
-            document.querySelectorAll('nav button').forEach(b => b.classList.replace('text-indigo-600', 'text-slate-400'));
-            btn.classList.replace('text-slate-400', 'text-indigo-600');
-            ['store','history','help'].forEach(s => document.getElementById(s+'-page').classList.add('hidden'));
-            document.getElementById(p+'-page').classList.remove('hidden');
-        };
         window.admTab = (t, btn) => {
             document.querySelectorAll('.adm-tab').forEach(b => b.classList.remove('adm-tab-active'));
             btn.classList.add('adm-tab-active');
