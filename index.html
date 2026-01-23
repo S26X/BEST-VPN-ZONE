@@ -13,120 +13,134 @@
     <style>
         :root { --p: #6366f1; }
         * { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #fcfdfe; color: #1e293b; padding-bottom: 110px; }
         
-        /* Premium Soft Loading Screen */
-        #loading-screen { position: fixed; inset: 0; background: #fff; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
-        .pulse-bg { position: absolute; width: 200px; height: 200px; background: rgba(99, 102, 241, 0.08); border-radius: 50%; animation: softPulse 2s infinite ease-in-out; }
-        .loader-content { position: relative; text-align: center; animation: floating 3s infinite ease-in-out; }
+        body { 
+            background: radial-gradient(circle at top right, #eef2ff 0%, #ffffff 50%, #f0f9ff 100%);
+            min-height: 100vh;
+            color: #1e293b; 
+            padding-bottom: 110px; 
+        }
+        
+        #loading-screen { position: fixed; inset: 0; background: #fff; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.8s; }
+        .pulse-bg { position: absolute; width: 220px; height: 220px; background: rgba(99, 102, 241, 0.1); border-radius: 50%; animation: softPulse 2s infinite; }
         @keyframes softPulse { 0% { transform: scale(0.8); opacity: 0.5; } 50% { transform: scale(1.3); opacity: 0.2; } 100% { transform: scale(0.8); opacity: 0.5; } }
-        @keyframes floating { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-15px); } }
 
-        .card { background: #fff; border-radius: 22px; padding: 16px; border: 1px solid #f1f5f9; position: relative; transition: 0.3s; }
-        .btn-p { background: #1e1b4b; color: #fff; width: 100%; padding: 16px; border-radius: 20px; font-weight: 800; font-size: 14px; }
+        .card { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border-radius: 24px; padding: 16px; border: 1px solid rgba(255,255,255,0.8); position: relative; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.03); transition: 0.3s; }
+        .btn-p { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); color: #fff; width: 100%; padding: 16px; border-radius: 20px; font-weight: 800; font-size: 14px; box-shadow: 0 10px 20px -5px rgba(30,27,75,0.3); }
         
-        .adm-nav { display: flex; background: #f1f5f9; padding: 5px; border-radius: 15px; margin-bottom: 15px; }
-        .adm-tab { flex: 1; padding: 10px; font-size: 11px; font-weight: 800; color: #64748b; border-radius: 12px; text-align: center; }
-        .adm-tab-active { background: #fff; color: #6366f1; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .adm-nav { display: flex; background: #f1f5f9; padding: 5px; border-radius: 18px; margin-bottom: 15px; }
+        .adm-tab { flex: 1; padding: 12px; font-size: 11px; font-weight: 800; color: #64748b; border-radius: 14px; text-align: center; }
+        .adm-tab-active { background: #fff; color: #6366f1; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
         
-        .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(6px); z-index: 2000; display: none; align-items: flex-end; justify-content: center; }
-        .sheet { background: #fff; width: 100%; max-width: 450px; border-radius: 32px 32px 0 0; padding: 25px; animation: slideUp 0.3s ease; }
+        .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(8px); z-index: 2000; display: none; align-items: flex-end; justify-content: center; }
+        .sheet { background: #fff; width: 100%; max-width: 450px; border-radius: 35px 35px 0 0; padding: 30px; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-        /* Custom Toggle */
-        .switch { position: relative; display: inline-block; width: 38px; height: 20px; }
+        .trx-box { background: #f0f7ff; border: 2px dashed #6366f1; padding: 12px; border-radius: 16px; font-family: monospace; color: #4338ca; font-weight: 800; margin: 10px 0; display: block; width: 100%; text-align: center; font-size: 14px; }
+
+        .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; inset: 0; background-color: #cbd5e1; transition: .3s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+        .slider { position: absolute; cursor: pointer; inset: 0; background-color: #cbd5e1; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: #6366f1; }
         input:checked + .slider:before { transform: translateX(18px); }
+
+        .vpn-icon-main { width: 50px; height: 50px; border-radius: 16px; object-fit: cover; background: #fff; padding: 5px; border: 1px solid #f1f5f9; }
     </style>
 </head>
 <body>
 
     <div id="loading-screen">
         <div class="pulse-bg"></div>
-        <div class="loader-content">
-            <div class="w-20 h-20 bg-indigo-500 rounded-3xl flex items-center justify-center mx-auto mb-5 shadow-xl shadow-indigo-200">
+        <div class="text-center relative">
+            <div class="w-20 h-20 bg-indigo-500 rounded-[28px] flex items-center justify-center mx-auto mb-5 shadow-2xl shadow-indigo-200">
                 <i class="fa-solid fa-shield-halved text-white text-3xl"></i>
             </div>
-            <h1 class="font-black text-xl tracking-tighter">BEST<span class="text-indigo-500">VPN-ZONE</span></h1>
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">...</p>
+            <h1 class="font-black text-2xl tracking-tighter italic">BEST<span class="text-indigo-500">VPN-ZONE</span></h1>
         </div>
     </div>
 
     <div class="max-w-md mx-auto">
-        <header class="p-6 flex justify-between items-center sticky top-0 bg-white/80 backdrop-blur-xl z-50">
-            <h1 class="font-black text-2xl tracking-tighter italic">BEST<span class="text-indigo-500">VPN-ZONE</span></h1>
-            <button id="admin-btn" onclick="openAdmin()" class="hidden w-11 h-11 bg-slate-50 text-slate-500 rounded-2xl flex items-center justify-center border border-slate-100">
-                <i class="fa-solid fa-sliders"></i>
-            </button>
+        <header class="p-6 flex justify-between items-center">
+            <h1 class="font-black text-2xl tracking-tighter italic">BEST<span class="text-indigo-600">VPN-ZONE</span></h1>
+            <div id="p-count-badge" class="hidden bg-rose-500 text-white text-[10px] font-black px-2 py-1 rounded-full animate-bounce">0</div>
         </header>
 
-        <main class="p-5 space-y-6">
-            <div class="card bg-indigo-600 border-none p-6 text-white overflow-hidden shadow-xl shadow-indigo-100">
-                <div class="flex items-center gap-4 relative z-10">
-                    <img id="u-pic" class="w-14 h-14 rounded-2xl border-2 border-white/20">
+        <main class="p-5 space-y-5">
+            <div class="card bg-gradient-to-br from-indigo-600 to-blue-700 border-none p-7 text-white shadow-2xl shadow-indigo-200">
+                <div class="flex items-center gap-5">
+                    <img id="u-pic" class="w-16 h-16 rounded-[22px] border-2 border-white/30 shadow-lg">
                     <div>
-                        <h2 id="u-nickname" class="text-lg font-black leading-tight">...</h2>
-                        <p id="display-uid" class="text-[9px] font-bold opacity-60 tracking-widest mt-1"></p>
+                        <h2 id="u-nickname" class="text-xl font-black tracking-tight">...</h2>
+                        <p id="display-uid" class="text-[10px] font-bold opacity-70 tracking-widest mt-1 uppercase"></p>
                     </div>
                 </div>
             </div>
 
+            <button id="admin-btn" onclick="openAdmin()" class="hidden w-full bg-white border border-indigo-50 p-4 rounded-2xl flex items-center justify-between shadow-sm active:scale-[0.98] transition">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-indigo-50 text-indigo-500 rounded-xl flex items-center justify-center"><i class="fa-solid fa-user-shield"></i></div>
+                    <b class="text-sm font-bold text-slate-700">Open Admin Control</b>
+                </div>
+                <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
+            </button>
+
             <div id="store-page" class="space-y-4">
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Active Services</p>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Available VPNs</p>
                 <div id="vpn-list" class="space-y-3"></div>
             </div>
 
             <div id="history-page" class="hidden space-y-3">
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Order History</p>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Order Tracking</p>
                 <div id="user-orders" class="space-y-3"></div>
             </div>
 
             <div id="help-page" class="hidden text-center card py-12">
-                <i class="fa-brands fa-telegram text-5xl text-indigo-500 mb-4"></i>
-                <h4 class="font-black text-xl">Need Help?</h4>
-                <a href="https://t.me/your_admin" class="btn-p block mt-8">Message Support</a>
+                <div class="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-5">
+                    <i class="fa-brands fa-telegram text-5xl text-indigo-500"></i>
+                </div>
+                <h4 class="font-black text-xl">Contact Support</h4>
+                <a id="support-link" href="#" class="btn-p block mt-8">Message Admin</a>
             </div>
         </main>
 
-        <nav class="fixed bottom-0 w-full max-w-md bg-white border-t h-20 flex justify-around items-center z-[1000]">
-            <button onclick="nav('store', this)" class="text-indigo-600 flex flex-col items-center gap-1 font-bold text-[10px]"><i class="fa-solid fa-shop text-xl"></i>Store</button>
-            <button onclick="nav('history', this)" class="text-slate-400 flex flex-col items-center gap-1 font-bold text-[10px]"><i class="fa-solid fa-receipt text-xl"></i>Orders</button>
+        <nav class="fixed bottom-0 w-full max-w-md bg-white/80 backdrop-blur-xl border-t h-20 flex justify-around items-center z-[1000]">
+            <button onclick="nav('store', this)" class="text-indigo-600 flex flex-col items-center gap-1 font-bold text-[10px]"><i class="fa-solid fa-store text-xl"></i>Store</button>
+            <button onclick="nav('history', this)" class="text-slate-400 flex flex-col items-center gap-1 font-bold text-[10px]"><i class="fa-solid fa-box text-xl"></i>Orders</button>
             <button onclick="nav('help', this)" class="text-slate-400 flex flex-col items-center gap-1 font-bold text-[10px]"><i class="fa-solid fa-headset text-xl"></i>Help</button>
         </nav>
     </div>
 
-    <div id="admin-panel" class="fixed inset-0 bg-white z-[5000] hidden flex flex-col">
-        <div class="p-6 flex justify-between items-center border-b">
-            <h2 class="font-black text-xl">Admin Control</h2>
-            <button onclick="closeAdmin()" class="w-10 h-10 bg-slate-100 rounded-full">&times;</button>
+    <div id="admin-panel" class="fixed inset-0 bg-slate-50 z-[5000] hidden flex flex-col">
+        <div class="p-6 flex justify-between items-center bg-white border-b">
+            <h2 class="font-black text-xl">Admin Panel</h2>
+            <button onclick="closeAdmin()" class="w-10 h-10 bg-slate-100 rounded-full font-bold">&times;</button>
         </div>
-        <div class="p-5 bg-white">
-            <div class="bg-indigo-50 p-4 rounded-2xl flex justify-between items-center border border-indigo-100 mb-4">
-                <div><p class="text-[10px] font-black text-indigo-400 uppercase">Total Pending</p><b id="pending-count" class="text-2xl text-indigo-600">0</b></div>
-                <i class="fa-solid fa-bolt-lightning text-xl text-indigo-200"></i>
-            </div>
+        <div class="p-5 bg-white shadow-sm">
             <div class="adm-nav">
-                <button onclick="admTab('pending', this)" class="adm-tab adm-tab-active">PENDING</button>
+                <button onclick="admTab('pending', this)" class="adm-tab adm-tab-active">PENDING (<span id="p-count">0</span>)</button>
                 <button onclick="admTab('history', this)" class="adm-tab">HISTORY</button>
-                <button onclick="admTab('settings', this)" class="adm-tab">SETTINGS</button>
+                <button onclick="admTab('settings', this)" class="adm-tab">SETUP</button>
             </div>
         </div>
-        <div class="p-5 overflow-y-auto flex-1 bg-slate-50/50 space-y-4">
-            <div id="adm-pending" class="adm-content space-y-3"></div>
+        <div class="p-5 overflow-y-auto flex-1">
+            <div id="adm-pending" class="adm-content space-y-4"></div>
             <div id="adm-history" class="adm-content hidden space-y-3"></div>
             <div id="adm-settings" class="adm-content hidden space-y-6">
+                <div class="card space-y-3">
+                    <b class="text-xs uppercase">Support Link</b>
+                    <input type="text" id="set-support-url" placeholder="https://t.me/yourname" class="w-full p-3 border rounded-xl text-sm">
+                    <button onclick="saveSupport()" class="btn-p py-3 text-xs">Save Link</button>
+                </div>
                 <div class="card space-y-3 border-dashed border-2">
-                    <b class="text-xs">ADD NEW VPN</b>
-                    <input type="text" id="v-name" placeholder="Name" class="w-full p-3 border rounded-xl text-sm">
-                    <button onclick="addVpn()" class="btn-p py-3 text-xs">Add</button>
+                    <b class="text-xs uppercase">Add New Service</b>
+                    <input type="text" id="v-name" placeholder="Name (e.g. NordVPN)" class="w-full p-3 border rounded-xl text-sm">
+                    <button onclick="addVpn()" class="btn-p py-3 text-xs">Add VPN</button>
                 </div>
                 <div id="adm-vpn-list" class="space-y-3"></div>
                 <hr>
                 <div class="card space-y-4">
-                    <b class="text-xs uppercase text-slate-400">Payments</b>
+                    <b class="text-xs uppercase text-slate-400">Payment Methods</b>
                     <div class="flex gap-2"><input type="text" id="pay-name" placeholder="Bkash" class="w-1/2 p-3 border rounded-xl text-xs"><input type="text" id="pay-num-in" placeholder="017..." class="w-1/2 p-3 border rounded-xl text-xs"></div>
                     <button onclick="addPay()" class="btn-p py-3 text-xs bg-slate-800">Add Method</button>
                     <div id="pay-list" class="space-y-2 mt-4"></div>
@@ -138,24 +152,23 @@
     <div id="plan-modal" class="modal"><div class="sheet" id="plan-content"></div></div>
     <div id="pay-modal" class="modal">
         <div class="sheet text-center">
-            <h3 class="font-black text-lg mb-6">Select Method</h3>
+            <h3 class="font-black text-xl mb-6">Payment</h3>
             <div id="user-pay-options" class="grid grid-cols-2 gap-3 mb-6"></div>
             <div id="pay-details" class="hidden">
-                <div class="bg-indigo-50 p-6 rounded-3xl border border-indigo-100 mb-6 cursor-pointer" onclick="copyText(document.getElementById('active-num').innerText)">
-                    <p class="text-[9px] font-bold text-indigo-400 uppercase mb-2">Tap to copy</p>
+                <div class="bg-indigo-50 p-6 rounded-3xl border border-indigo-100 mb-6" onclick="copyText(document.getElementById('active-num').innerText)">
+                    <p class="text-[9px] font-bold text-indigo-400 mb-2 uppercase">Tap to Copy Number</p>
                     <b id="active-num" class="text-2xl text-indigo-700 tracking-wider"></b>
-                    <p id="active-method" class="text-xs font-bold text-indigo-400 mt-1 uppercase"></p>
                 </div>
-                <b id="target-price" class="text-xl block mb-6"></b>
-                <input type="text" id="trx-id" placeholder="Transaction ID (TRXID)" class="w-full p-4 border rounded-2xl text-center uppercase font-bold mb-4 bg-slate-50">
-                <button onclick="orderNow()" class="btn-p">Submit Order</button>
+                <b id="target-price" class="text-xl block mb-6 text-indigo-600"></b>
+                <input type="text" id="trx-id" placeholder="Transaction ID (TrxID)" class="w-full p-4 border-2 border-slate-100 rounded-2xl text-center uppercase font-black mb-4 focus:border-indigo-400 outline-none">
+                <button onclick="orderNow()" class="btn-p">Confirm Order</button>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, onValue, push, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, onValue, push, remove, update, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDZQHw4-DdUdDmJXcuK_88JrJxv35FfYeY",
@@ -183,21 +196,52 @@
             document.getElementById('u-pic').src = UPHOTO;
             if(ADMINS.includes(UID.toString())) document.getElementById('admin-btn').classList.remove('hidden');
             sync();
-            setTimeout(() => { 
-                const ls = document.getElementById('loading-screen');
-                ls.style.opacity = '0';
-                setTimeout(() => ls.style.display='none', 800);
-            }, 2500);
+            setTimeout(() => { document.getElementById('loading-screen').style.opacity = '0'; setTimeout(()=> document.getElementById('loading-screen').style.display='none', 800); }, 2500);
         };
 
+        // Google Favicon API Logic
+        function getAutoLogo(name) {
+            const domain = name.toLowerCase().replace(/\s+/g, '') + ".com";
+            return `https://www.google.com/s2/favicons?sz=128&domain=${domain}`;
+        }
+
         function sync() {
+            onValue(ref(db, 'supportUrl'), (s) => {
+                const url = s.val() || "#";
+                document.getElementById('support-link').href = url;
+                document.getElementById('set-support-url').value = (url === "#") ? "" : url;
+            });
+
             onValue(ref(db, 'vpns'), (s) => {
                 const uBox = document.getElementById('vpn-list'), aBox = document.getElementById('adm-vpn-list');
                 uBox.innerHTML = ''; aBox.innerHTML = '';
                 const d = s.val(); if(d) Object.keys(d).forEach(id => {
-                    const v = d[id], isOff = v.status === "OFF", logo = `https://www.google.com/s2/favicons?sz=128&domain=${v.name.toLowerCase().replace(/\s/g, '')}.com`;
-                    uBox.innerHTML += `<div onclick="${isOff ? '' : `openPlans('${id}')`}" class="card flex items-center justify-between ${isOff ? 'opacity-70' : 'active:scale-95'}">${isOff ? '<div class="absolute inset-0 bg-white/70 rounded-[22px] flex items-center justify-end pr-5 z-10"><span class="bg-rose-100 text-rose-500 text-[9px] font-black px-3 py-1.5 rounded-lg border border-rose-200 uppercase">Stock Out</span></div>' : ''}<div class="flex items-center gap-4"><img src="${logo}" class="w-12 h-12 rounded-2xl border" onerror="this.src='https://ui-avatars.com/api/?name=${v.name}'"><div><b class="text-sm font-bold text-slate-800">${v.name}</b><p class="text-[9px] font-bold uppercase mt-1 text-indigo-500">Premium VPN</p></div></div><i class="fa-solid fa-chevron-right text-slate-200"></i></div>`;
-                    aBox.innerHTML += `<div class="card space-y-4"><div class="flex justify-between items-center"><b class="text-sm">${v.name}</b><div class="flex items-center gap-3"><label class="switch"><input type="checkbox" ${!isOff?'checked':''} onchange="updateVpnStatus('${id}',this.checked)"><span class="slider"></span></label><i onclick="delV('${id}')" class="fa-solid fa-trash-can text-rose-300"></i></div></div><div class="grid grid-cols-2 gap-2"><input type="text" id="p1n-${id}" value="${v.p1n||''}" placeholder="Plan 1" class="p-2 border rounded-xl text-[10px] bg-slate-50"><input type="number" id="p1p-${id}" value="${v.p1p||''}" placeholder="Price" class="p-2 border rounded-xl text-[10px] bg-slate-50"><input type="text" id="p2n-${id}" value="${v.p2n||''}" placeholder="Plan 2" class="p-2 border rounded-xl text-[10px] bg-slate-50"><input type="number" id="p2p-${id}" value="${v.p2p||''}" placeholder="Price" class="p-2 border rounded-xl text-[10px] bg-slate-50"></div><button onclick="saveV('${id}')" class="w-full bg-slate-800 text-white p-2.5 rounded-xl text-[10px] font-extrabold">UPDATE DATA</button></div>`;
+                    const v = d[id], isOff = v.status === "OFF", logo = getAutoLogo(v.name);
+                    uBox.innerHTML += `
+                    <div onclick="${isOff ? '' : `openPlans('${id}')`}" class="card flex justify-between items-center bg-white ${isOff ? 'opacity-60' : 'active:scale-95'}">
+                        ${isOff ? '<span class="text-[9px] font-black text-rose-500 bg-rose-50 px-2 py-1 rounded">OFF</span>' : ''}
+                        <div class="flex items-center gap-4">
+                            <img src="${logo}" class="vpn-icon-main" onerror="this.src='https://ui-avatars.com/api/?name=${v.name}&background=6366f1&color=fff'">
+                            <b class="text-sm">${v.name}</b>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-slate-200"></i>
+                    </div>`;
+                    
+                    aBox.innerHTML += `
+                    <div class="card space-y-4">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-2"><img src="${logo}" class="w-8 h-8 rounded-lg"><b>${v.name}</b></div>
+                            <div class="flex gap-3 items-center">
+                                <label class="switch"><input type="checkbox" ${!isOff?'checked':''} onchange="updateVpnStatus('${id}',this.checked)"><span class="slider"></span></label>
+                                <i onclick="delV('${id}')" class="fa-solid fa-trash text-rose-300"></i>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="text" id="p1n-${id}" value="${v.p1n||''}" placeholder="Plan 1" class="p-2 border rounded-xl text-xs">
+                            <input type="number" id="p1p-${id}" value="${v.p1p||''}" placeholder="Price" class="p-2 border rounded-xl text-xs">
+                        </div>
+                        <button onclick="saveV('${id}')" class="w-full bg-slate-800 text-white p-2 rounded-xl text-xs font-bold uppercase">Update Plans</button>
+                    </div>`;
                 });
             });
 
@@ -208,101 +252,96 @@
                 const d = s.val(); if(d) Object.keys(d).forEach(id => {
                     const o = d[id];
                     if(o.uid == UID) {
-                        uBox.innerHTML += `<div class="card space-y-3"><div class="flex justify-between items-center"><div><b class="text-[13px]">${o.vpn}</b><p class="text-[9px] text-slate-400 font-bold uppercase">${o.plan} • ৳${o.price}</p></div><span class="text-[9px] font-black uppercase px-3 py-1.5 rounded-xl ${o.st==='Approved'?'bg-emerald-50 text-emerald-500': o.st==='Cancelled' ? 'bg-rose-50 text-rose-500' : 'bg-amber-50 text-amber-500'}">${o.st}</span></div>${o.email ? `<div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100 space-y-2"><div onclick="copyText('${o.email}')" class="flex justify-between items-center"><span class="text-[9px] font-bold text-slate-400">EMAIL:</span><b class="text-[11px] text-indigo-600">${o.email}</b></div><div onclick="copyText('${o.pass}')" class="flex justify-between items-center"><span class="text-[9px] font-bold text-slate-400">PASS:</span><b class="text-[11px] text-indigo-600">${o.pass}</b></div></div>` : ''}</div>`;
+                        uBox.innerHTML += `
+                        <div class="card space-y-3">
+                            <div class="flex justify-between items-center">
+                                <div><b>${o.vpn}</b><p class="text-[10px] text-slate-400 font-bold">${o.plan} • ৳${o.price}</p></div>
+                                <span class="text-[10px] font-black px-3 py-1 rounded-lg ${o.st==='Approved'?'bg-emerald-50 text-emerald-500':o.st==='Cancelled'?'bg-rose-50 text-rose-500':'bg-amber-50 text-amber-500'}">${o.st}</span>
+                            </div>
+                            ${o.email ? `<div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-50 space-y-2 text-[11px]"><p onclick="copyText('${o.email}')">Email: <b>${o.email}</b></p><p onclick="copyText('${o.pass}')">Pass: <b>${o.pass}</b></p></div>` : ''}
+                        </div>`;
                     }
                     if(o.st === "Pending") {
                         pCount++;
-                        aP.innerHTML += `<div class="card space-y-3"><div class="flex justify-between"><div><b class="text-sm">${o.user}</b><p class="text-[10px] text-slate-400 mt-1">${o.vpn} • Trx: ${o.trx}</p></div><b class="text-indigo-600">৳${o.price}</b></div><div class="flex gap-2"><button onclick="approveForm('${id}')" class="flex-1 bg-emerald-500 text-white py-2 rounded-xl text-[10px] font-black">APPROVE</button><button onclick="rejectOrder('${id}')" class="flex-1 bg-rose-500 text-white py-2 rounded-xl text-[10px] font-black">REJECT</button></div></div>`;
+                        aP.innerHTML += `
+                        <div class="card space-y-3">
+                            <div class="flex justify-between items-start"><div><b>${o.user}</b><p class="text-[10px] text-slate-400">${o.vpn} - ${o.plan}</p></div><b class="text-indigo-600">৳${o.price}</b></div>
+                            <div class="trx-box" onclick="copyText('${o.trx}')">${o.trx}</div>
+                            <div class="flex gap-2">
+                                <button onclick="approveAction('${id}')" class="flex-1 bg-emerald-500 text-white py-2 rounded-xl text-[10px] font-black">APPROVE</button>
+                                <button onclick="rejectAction('${id}')" class="flex-1 bg-rose-500 text-white py-2 rounded-xl text-[10px] font-black">REJECT</button>
+                            </div>
+                        </div>`;
                     } else {
-                        aH.innerHTML += `<div class="card text-[10px] flex justify-between items-center py-2 opacity-60"><span><b>${o.user}</b>: ${o.vpn} (${o.st})</span><button onclick="delO('${id}')" class="text-rose-400 px-2"><i class="fa-solid fa-trash-can"></i></button></div>`;
+                        aH.innerHTML += `<div class="card flex justify-between items-center text-[10px] opacity-60"><span><b>${o.user}</b> - ${o.vpn} (${o.st})</span><button onclick="delO('${id}')" class="text-rose-400 px-2"><i class="fa-solid fa-trash-can"></i></button></div>`;
                     }
                 });
-                document.getElementById('pending-count').innerText = pCount;
+                document.getElementById('p-count').innerText = pCount;
+                if(pCount > 0) { document.getElementById('p-count-badge').classList.remove('hidden'); document.getElementById('p-count-badge').innerText = pCount; }
+                else document.getElementById('p-count-badge').classList.add('hidden');
             });
 
             onValue(ref(db, 'payments'), (s) => {
-                const pBox = document.getElementById('pay-list'), uP = document.getElementById('user-pay-options');
-                pBox.innerHTML = ''; uP.innerHTML = '';
+                const uP = document.getElementById('user-pay-options'), pL = document.getElementById('pay-list');
+                uP.innerHTML = ''; pL.innerHTML = '';
                 const d = s.val(); if(d) Object.keys(d).forEach(id => {
                     const p = d[id];
-                    pBox.innerHTML += `<div class="flex justify-between items-center bg-white p-3 rounded-xl border text-[10px] font-bold"><span>${p.name}: ${p.num}</span><i onclick="delPay('${id}')" class="fa-solid fa-circle-xmark text-rose-300"></i></div>`;
-                    uP.innerHTML += `<div onclick="setPay('${p.name}','${p.num}')" class="p-4 border border-slate-100 rounded-2xl font-black text-[10px] uppercase tracking-wider hover:border-indigo-500 transition-all cursor-pointer">${p.name}</div>`;
+                    pL.innerHTML += `<div class="flex justify-between items-center bg-white p-3 rounded-xl border text-[10px] font-bold"><span>${p.name}: ${p.num}</span><i onclick="delPay('${id}')" class="fa-solid fa-circle-xmark text-rose-300"></i></div>`;
+                    uP.innerHTML += `<div onclick="setPay('${p.name}','${p.num}')" class="p-4 border-2 border-slate-100 rounded-2xl font-black text-[10px] uppercase">${p.name}</div>`;
                 });
             });
         }
 
-        // Action Functions
+        window.saveSupport = () => set(ref(db, 'supportUrl'), document.getElementById('set-support-url').value).then(()=> Swal.fire('Link Saved!', '', 'success'));
+        window.approveAction = async (id) => {
+            const { value: f } = await Swal.fire({ title: 'Deliver Account', html: '<input id="sw-m" placeholder="ID/Email" class="swal2-input"><input id="sw-p" placeholder="Password" class="swal2-input">', preConfirm: () => ({ e: document.getElementById('sw-m').value, p: document.getElementById('sw-p').value }) });
+            if(f && f.e) update(ref(db, `orders/${id}`), { st: "Approved", email: f.e, pass: f.p });
+        };
+        window.rejectAction = (id) => update(ref(db, `orders/${id}`), { st: "Cancelled" });
         window.nav = (p, btn) => {
             document.querySelectorAll('nav button').forEach(b => b.classList.replace('text-indigo-600', 'text-slate-400'));
             btn.classList.replace('text-slate-400', 'text-indigo-600');
             ['store','history','help'].forEach(s => document.getElementById(s+'-page').classList.add('hidden'));
             document.getElementById(p+'-page').classList.remove('hidden');
         };
-
         window.admTab = (t, btn) => {
             document.querySelectorAll('.adm-tab').forEach(b => b.classList.remove('adm-tab-active'));
             btn.classList.add('adm-tab-active');
             document.querySelectorAll('.adm-content').forEach(c => c.classList.add('hidden'));
             document.getElementById('adm-'+t).classList.remove('hidden');
         };
+        window.copyText = (t) => { navigator.clipboard.writeText(t); tg.HapticFeedback.notificationOccurred('success'); Swal.fire({ title: 'Copied!', icon: 'success', toast: true, position: 'top', showConfirmButton: false, timer: 1000 }); };
 
-        window.copyText = (txt) => {
-            navigator.clipboard.writeText(txt);
-            tg.HapticFeedback.notificationOccurred('success');
-            Swal.fire({ title: 'Copied!', icon: 'success', toast: true, position: 'top', showConfirmButton: false, timer: 1200 });
-        };
-
-        window.approveForm = async (id) => {
-            const { value: formValues } = await Swal.fire({
-                title: 'Deliver Account',
-                html: '<input id="sw-mail" placeholder="Email/ID" class="swal2-input"><input id="sw-pass" placeholder="Password" class="swal2-input">',
-                confirmButtonText: 'Approve & Send',
-                preConfirm: () => {
-                    const email = document.getElementById('sw-mail').value;
-                    const pass = document.getElementById('sw-pass').value;
-                    if(!email || !pass) return Swal.showValidationMessage('Both required');
-                    return { email, pass }
-                }
-            });
-            if(formValues) update(ref(db, `orders/${id}`), { st: "Approved", email: formValues.email, pass: formValues.pass });
-        };
-
-        window.rejectOrder = (id) => {
-            Swal.fire({ title: 'Reject?', text: "Order will be cancelled!", icon: 'warning', showCancelButton: true }).then((r) => {
-                if(r.isConfirmed) update(ref(db, `orders/${id}`), { st: "Cancelled" });
-            });
-        };
-
-        // Modal Helpers
-        let cV, cPl, cPr;
+        let curV, curPl, curPr;
         window.openPlans = (id) => {
             onValue(ref(db,`vpns/${id}`), (s) => {
-                const v = s.val(); cV = v.name;
-                let h = `<div class="w-12 h-1 bg-slate-100 rounded-full mx-auto mb-6"></div><h3 class="font-black text-xl mb-6">${v.name}</h3>`;
-                if(v.p1n) h += `<div onclick="goPay('${v.p1n}','${v.p1p}')" class="card bg-slate-50 border-none flex justify-between font-bold py-5 px-6 items-center mb-2"><span>${v.p1n}</span><span class="text-indigo-600 bg-white px-4 py-1.5 rounded-xl shadow-sm">৳${v.p1p}</span></div>`;
-                if(v.p2n) h += `<div onclick="goPay('${v.p2n}','${v.p2p}')" class="card bg-slate-50 border-none flex justify-between font-bold py-5 px-6 items-center mb-2"><span>${v.p2n}</span><span class="text-indigo-600 bg-white px-4 py-1.5 rounded-xl shadow-sm">৳${v.p2p}</span></div>`;
+                const v = s.val(); curV = v.name;
+                let h = `<h3 class="font-black text-2xl mb-6">${v.name}</h3>`;
+                if(v.p1n) h += `<div onclick="goPay('${v.p1n}','${v.p1p}')" class="card bg-indigo-50/50 flex justify-between mb-3 border-indigo-100 p-5 font-bold"><span>${v.p1n}</span><b class="text-indigo-600">৳${v.p1p}</b></div>`;
+                if(v.p2n) h += `<div onclick="goPay('${v.p2n}','${v.p2p}')" class="card bg-indigo-50/50 flex justify-between mb-3 border-indigo-100 p-5 font-bold"><span>${v.p2n}</span><b class="text-indigo-600">৳${v.p2p}</b></div>`;
                 document.getElementById('plan-content').innerHTML = h; document.getElementById('plan-modal').style.display = 'flex';
             }, {onlyOnce:true});
         };
-
-        window.goPay = (n, p) => { cPl = n; cPr = p; document.getElementById('plan-modal').style.display='none'; document.getElementById('pay-modal').style.display='flex'; document.getElementById('target-price').innerText = "Amount: ৳"+p; document.getElementById('pay-details').classList.add('hidden'); };
-        window.setPay = (n, m) => { document.getElementById('active-num').innerText = m; document.getElementById('active-method').innerText = n; document.getElementById('pay-details').classList.remove('hidden'); };
+        window.goPay = (n, p) => { curPl = n; curPr = p; document.getElementById('plan-modal').style.display='none'; document.getElementById('pay-modal').style.display='flex'; document.getElementById('target-price').innerText = "Amount: ৳"+p; };
+        window.setPay = (n, m) => { document.getElementById('active-num').innerText = m; document.getElementById('pay-details').classList.remove('hidden'); };
         window.orderNow = () => {
-            const trx = document.getElementById('trx-id').value; if(!trx) return Swal.fire('Error', 'Enter TrxID', 'error');
-            push(ref(db, 'orders'), { vpn: cV, plan: cPl, price: cPr, trx: trx.toUpperCase(), uid: UID, user: UNAME, st: "Pending" }).then(() => { 
-                Swal.fire('Success', 'Order Placed!', 'success'); document.getElementById('pay-modal').style.display = 'none'; document.getElementById('trx-id').value = ''; 
+            const trx = document.getElementById('trx-id').value;
+            if(!trx) return;
+            push(ref(db, 'orders'), { vpn: curV, plan: curPl, price: curPr, trx: trx.toUpperCase(), uid: UID, user: UNAME, st: "Pending" }).then(() => {
+                Swal.fire('Success', 'Order Placed!', 'success');
+                document.getElementById('pay-modal').style.display = 'none';
+                document.getElementById('trx-id').value = '';
             });
         };
-
         window.openAdmin = () => document.getElementById('admin-panel').classList.remove('hidden');
         window.closeAdmin = () => document.getElementById('admin-panel').classList.add('hidden');
         window.addVpn = () => { const n = document.getElementById('v-name').value; if(n) push(ref(db,'vpns'),{name:n,status:"ON"}); document.getElementById('v-name').value=''; };
-        window.saveV = (id) => update(ref(db,`vpns/${id}`), { p1n:document.getElementById(`p1n-${id}`).value, p1p:document.getElementById(`p1p-${id}`).value, p2n:document.getElementById(`p2n-${id}`).value, p2p:document.getElementById(`p2p-${id}`).value });
-        window.updateVpnStatus = (id, chk) => update(ref(db,`vpns/${id}`), { status: chk ? "ON" : "OFF" });
+        window.saveV = (id) => update(ref(db,`vpns/${id}`), { p1n:document.getElementById(`p1n-${id}`).value, p1p:document.getElementById(`p1p-${id}`).value });
+        window.updateVpnStatus = (id, c) => update(ref(db,`vpns/${id}`), { status: c ? "ON" : "OFF" });
         window.delV = (id) => remove(ref(db,`vpns/${id}`));
+        window.delO = (id) => remove(ref(db,`orders/${id}`));
         window.addPay = () => { const n = document.getElementById('pay-name').value, m = document.getElementById('pay-num-in').value; if(n&&m) push(ref(db,'payments'),{name:n,num:m}); };
         window.delPay = (id) => remove(ref(db,`payments/${id}`));
-        window.delO = (id) => remove(ref(db,`orders/${id}`));
         window.onclick = (e) => { if(e.target.className === 'modal') e.target.style.display = 'none'; }
     </script>
 </body>
