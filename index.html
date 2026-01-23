@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Niva Zone - Telegram Mini App</title>
+    <title>BEST VPN ZONE</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -15,85 +14,95 @@
     <style>
         :root { --p: #6366f1; }
         * { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #fdfeff; color: #1e293b; overflow-x: hidden; padding-bottom: 100px; }
+        body { background: #fcfdfe; color: #1e293b; overflow-x: hidden; padding-bottom: 110px; }
 
-        /* --- SOFT LOADING SCREEN --- */
-        #loading-screen { 
-            position: fixed; inset: 0; background: #ffffff; 
-            z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            opacity: 1; transition: opacity 0.5s ease;
+        /* --- SQUIRCLE LOGO STYLE --- */
+        .squircle-logo {
+            width: 55px; height: 55px;
+            object-fit: cover;
+            /* Squircle Shape using Mask or Clip Path */
+            background: #fff;
+            border-radius: 18px; /* Standard Squircle look */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid #f1f5f9;
         }
-        .loader-icon {
-            width: 70px; height: 70px; background: #f8fafc; border-radius: 25px;
-            box-shadow: 0 15px 35px rgba(99, 102, 241, 0.1);
-            display: flex; align-items: center; justify-content: center;
-            animation: bounce 2s infinite;
-        }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
-        .card { background: #fff; border: 1px solid #f1f5f9; border-radius: 25px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
-        .nav-btn { color: #94a3b8; }
-        .nav-active { color: var(--p) !important; }
+        /* --- LOADING SCREEN --- */
+        #loading-screen { position: fixed; inset: 0; background: #ffffff; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .loader-icon { width: 75px; height: 75px; background: white; border-radius: 22px; box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15); display: flex; align-items: center; justify-content: center; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+        .card { background: #fff; border-radius: 24px; padding: 18px; border: 1px solid #f1f5f9; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        .nav-btn { color: #94a3b8; font-size: 10px; font-weight: 700; }
+        .nav-active { color: #6366f1 !important; }
+
+        .input-box { width: 100%; padding: 15px; border-radius: 16px; border: 1.5px solid #f1f5f9; background: #f8fafc; font-weight: 600; margin-bottom: 12px; }
+        .btn-p { background: #1e1b4b; color: #fff; width: 100%; padding: 16px; border-radius: 18px; font-weight: 800; border: none; }
         
-        .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.1); backdrop-filter: blur(10px); z-index: 2000; display: none; align-items: flex-end; justify-content: center; }
-        .sheet { background: #fff; width: 100%; max-width: 450px; border-radius: 40px 40px 0 0; padding: 30px; animation: slide 0.4s ease-out; }
-        @keyframes slide { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
-        .input-box { width: 100%; padding: 16px; border-radius: 18px; border: 1.5px solid #f1f5f9; background: #f8fafc; font-weight: 600; margin-bottom: 12px; }
-        .btn-p { background: #1e1b4b; color: #fff; width: 100%; padding: 18px; border-radius: 20px; font-weight: 800; }
+        .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.2); backdrop-filter: blur(8px); z-index: 2000; display: none; align-items: flex-end; justify-content: center; }
+        .sheet { background: #fff; width: 100%; max-width: 450px; border-radius: 35px 35px 0 0; padding: 32px; animation: slideUp 0.4s ease; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     </style>
 </head>
 <body>
 
     <div id="loading-screen">
-        <div class="loader-icon"><i class="fa-solid fa-bolt text-3xl text-indigo-500"></i></div>
-        <p class="mt-8 font-black text-[10px] uppercase tracking-[0.3em] text-indigo-400">Authenticating...</p>
+        <div class="loader-icon"><i class="fa-solid fa-shield-halved text-3xl text-indigo-500"></i></div>
+        <p class="mt-8 font-black text-[11px] uppercase tracking-[0.4em] text-slate-400">Best VPN Zone</p>
     </div>
 
     <div id="main-content" class="max-w-md mx-auto">
         <header class="p-6 flex justify-between items-center sticky top-0 z-50 bg-white/70 backdrop-blur-md">
-            <h1 class="font-black text-2xl tracking-tighter">Niva <span class="text-indigo-500">Zone</span></h1>
-            <button onclick="openAdmin()" id="admin-btn" class="hidden w-11 h-11 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center"><i class="fa-solid fa-shapes"></i></button>
+            <h1 class="font-black text-2xl tracking-tighter">Best <span class="text-indigo-500">VPN</span></h1>
+            <button onclick="openAdmin()" id="admin-btn" class="hidden w-11 h-11 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center"><i class="fa-solid fa-sliders"></i></button>
         </header>
 
-        <main class="p-6 space-y-6">
-            <div class="card bg-indigo-600 border-none relative overflow-hidden p-6 text-white">
+        <main class="p-5 space-y-6">
+            <div class="card bg-indigo-600 border-none relative overflow-hidden p-6 text-white shadow-xl shadow-indigo-100">
                 <div class="relative z-10 flex items-center gap-5">
-                    <img id="u-pic" src="https://ui-avatars.com/api/?name=User" class="w-16 h-16 rounded-2xl border-4 border-white/30 object-cover">
+                    <img id="u-pic" src="" class="w-16 h-16 rounded-2xl border-2 border-white/30 object-cover shadow-lg">
                     <div>
-                        <h2 id="u-nickname" class="text-xl font-black">Telegram User</h2>
-                        <span id="display-uid" class="text-[10px] font-bold opacity-70 uppercase tracking-widest">ID: Loading...</span>
+                        <h2 id="u-nickname" class="text-xl font-black tracking-tight">User</h2>
+                        <span id="display-uid" class="text-[10px] font-bold opacity-60 uppercase tracking-widest">ID: 000000</span>
                     </div>
                 </div>
             </div>
 
             <div id="store-page" class="space-y-4">
-                <h3 class="font-bold text-xs text-slate-400 uppercase px-1">Global Marketplace</h3>
+                <h3 class="font-bold text-xs text-slate-400 uppercase tracking-widest px-1">Available Premium VPN</h3>
                 <div id="vpn-list" class="space-y-3"></div>
             </div>
 
-            <div id="history-page" class="hidden space-y-3"><div id="order-list" class="space-y-3"></div></div>
+            <div id="history-page" class="hidden space-y-3">
+                <h3 class="font-bold text-xs text-slate-400 uppercase tracking-widest px-1">My Recent Orders</h3>
+                <div id="order-list" class="space-y-3"></div>
+            </div>
             
-            <div id="help-page" class="hidden text-center card py-10">
+            <div id="help-page" class="hidden text-center card py-12">
                 <i class="fa-brands fa-telegram text-5xl text-indigo-600 mb-4"></i>
-                <h4 class="font-black text-xl">Need Support?</h4>
-                <a href="https://t.me/your_admin" class="btn-p block mt-6">Contact Admin</a>
+                <h4 class="font-black text-xl">24/7 Support</h4>
+                <a href="https://t.me/your_admin" class="btn-p block mt-8 mx-6 shadow-lg shadow-indigo-50">Contact via Telegram</a>
             </div>
         </main>
 
         <nav class="fixed bottom-0 w-full max-w-md bg-white border-t h-24 flex justify-around items-center z-[1000]">
-            <button onclick="nav('store', this)" class="nav-btn nav-active flex flex-col items-center gap-1 font-bold text-[10px]"><i class="fa-solid fa-house-user text-xl"></i>Store</button>
-            <button onclick="nav('history', this)" class="nav-btn flex flex-col items-center gap-1 font-bold text-[10px]"><i class="fa-solid fa-receipt text-xl"></i>Orders</button>
-            <button onclick="nav('help', this)" class="nav-btn flex flex-col items-center gap-1 font-bold text-[10px]"><i class="fa-solid fa-circle-info text-xl"></i>Help</button>
+            <button onclick="nav('store', this)" class="nav-btn nav-active flex flex-col items-center gap-1.5"><i class="fa-solid fa-house-chimney text-xl"></i>Store</button>
+            <button onclick="nav('history', this)" class="nav-btn flex flex-col items-center gap-1.5"><i class="fa-solid fa-clock-rotate-left text-xl"></i>Orders</button>
+            <button onclick="nav('help', this)" class="nav-btn flex flex-col items-center gap-1.5"><i class="fa-solid fa-headset text-xl"></i>Support</button>
         </nav>
     </div>
 
     <div id="admin-panel" class="fixed inset-0 bg-white z-[5000] hidden flex flex-col">
-        <div class="p-6 border-b flex justify-between items-center"><h2 class="font-black text-xl">Admin</h2><button onclick="closeAdmin()" class="text-2xl">&times;</button></div>
+        <div class="p-6 border-b flex justify-between items-center bg-slate-50">
+            <h2 class="font-black text-xl">Admin Dashboard</h2>
+            <button onclick="closeAdmin()" class="text-2xl font-bold">&times;</button>
+        </div>
         <div class="p-6 overflow-y-auto space-y-6">
-            <input type="text" id="v-name" placeholder="VPN Name" class="input-box">
-            <button onclick="addVpn()" class="btn-p">Add VPN</button>
-            <div id="adm-vpn-list" class="space-y-3"></div>
+            <div class="card bg-indigo-50/50 border-dashed border-2 border-indigo-200">
+                <input type="text" id="v-name" placeholder="VPN Name (e.g. NordVPN)" class="input-box">
+                <button onclick="addVpn()" class="btn-p">Add Automatically</button>
+            </div>
+            <div id="adm-vpn-list" class="space-y-4"></div>
             <div id="adm-order-list" class="space-y-3"></div>
         </div>
     </div>
@@ -101,13 +110,15 @@
     <div id="plan-modal" class="modal"><div class="sheet space-y-4" id="plan-content"></div></div>
     <div id="pay-modal" class="modal">
         <div class="sheet text-center">
-            <h3 class="font-black text-xl">Pay with bKash</h3>
-            <div class="bg-slate-50 p-6 rounded-3xl border my-6">
-                <p class="text-[10px] font-bold text-slate-400">01342101693</p>
-                <b id="target-price" class="text-2xl text-indigo-600"></b>
+            <div class="w-16 h-16 bg-[#d12053] text-white rounded-3xl mx-auto flex items-center justify-center text-3xl font-black mb-6">b</div>
+            <h3 class="font-black text-xl">Confirm Payment</h3>
+            <div class="bg-slate-50 p-6 rounded-3xl border my-6 text-left">
+                <p class="text-[10px] font-bold text-slate-400 mb-1">bKash (Personal)</p>
+                <p class="font-black text-lg">01342101693</p>
+                <b id="target-price" class="text-2xl text-indigo-600 block mt-2"></b>
             </div>
-            <input type="text" id="trx-id" placeholder="TrxID" class="input-box text-center uppercase">
-            <button onclick="orderNow()" class="btn-p">Submit Order</button>
+            <input type="text" id="trx-id" placeholder="Transaction ID" class="input-box text-center uppercase tracking-widest">
+            <button onclick="orderNow()" class="btn-p shadow-xl shadow-indigo-100">Submit Transaction</button>
         </div>
     </div>
 
@@ -127,45 +138,70 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-
-        // --- TELEGRAM SDK INTEGRATION ---
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Expand to full height
+        tg.expand();
 
         const userData = tg.initDataUnsafe?.user || {};
-        const UID = userData.id || "Guest_" + Math.floor(Math.random()*1000);
-        const UNAME = userData.username || userData.first_name || "Unknown User";
-        const UPHOTO = userData.photo_url || `https://ui-avatars.com/api/?background=6366f1&color=fff&name=${UNAME}`;
+        const UID = userData.id || "0000";
+        const UNAME = userData.first_name || "User";
+        const UPHOTO = userData.photo_url || `https://ui-avatars.com/api/?background=6366f1&color=fff&bold=true&name=${UNAME}`;
 
         const ADMINS = ["8505710811", "7940769450"];
 
         window.onload = () => {
-            // Apply Telegram Data
             document.getElementById('u-nickname').innerText = UNAME;
             document.getElementById('display-uid').innerText = "ID: " + UID;
             document.getElementById('u-pic').src = UPHOTO;
             if(ADMINS.includes(UID.toString())) document.getElementById('admin-btn').classList.remove('hidden');
-
             sync();
-
-            // Clear Loader
             setTimeout(() => {
                 const ls = document.getElementById('loading-screen');
                 ls.style.opacity = '0';
                 setTimeout(() => ls.style.display = 'none', 500);
-            }, 1500);
+            }, 1800);
         };
 
-        // --- FIREBASE SYNC (SAME AS BEFORE) ---
+        // --- NEW AUTO LOGO API (DuckDuckGo Service) ---
+        function getVpnLogo(name) {
+            const domain = name.toLowerCase().replace(/\s/g, '') + ".com";
+            // Using DuckDuckGo Favicon Service - High reliability
+            return `https://icons.duckduckgo.com/ip3/${domain}.ico`;
+        }
+
+        // --- FALLBACK LOGO IF API FAILS ---
+        window.logoError = (img, name) => {
+            img.onerror = null;
+            img.src = `https://ui-avatars.com/api/?background=random&color=fff&bold=true&name=${name}`;
+        };
+
         let curVpn = "", curPlan = "", curPrice = "";
+
         function sync() {
             onValue(ref(db, 'vpns'), (s) => {
                 const uBox = document.getElementById('vpn-list'), aBox = document.getElementById('adm-vpn-list');
                 uBox.innerHTML = ''; aBox.innerHTML = '';
                 const d = s.val(); if(d) Object.keys(d).forEach(id => {
                     const v = d[id];
-                    uBox.innerHTML += `<div onclick="openP('${id}')" class="card flex items-center justify-between"><div class="flex items-center gap-4"><img src="${v.logo}" class="w-12 h-12 rounded-xl border"><div><b class="text-sm">${v.name}</b><p class="text-[9px] text-indigo-500 font-bold uppercase mt-1">Premium</p></div></div><i class="fa-solid fa-chevron-right text-slate-200 text-xs"></i></div>`;
-                    aBox.innerHTML += `<div class="card space-y-2"><b>${v.name}</b> <input type="text" id="p1n-${id}" value="${v.p1n||''}" placeholder="Plan" class="input-box py-1 text-xs"> <input type="number" id="p1p-${id}" value="${v.p1p||''}" placeholder="Price" class="input-box py-1 text-xs"> <button onclick="saveV('${id}')" class="btn-p py-2 text-xs">Save</button><button onclick="delV('${id}')" class="text-rose-500 text-xs mt-2">Delete</button></div>`;
+                    const logo = getVpnLogo(v.name);
+                    
+                    uBox.innerHTML += `
+                        <div onclick="openP('${id}')" class="card flex items-center justify-between active:scale-[0.98] transition-all">
+                            <div class="flex items-center gap-4">
+                                <img src="${logo}" class="squircle-logo" onerror="logoError(this, '${v.name}')">
+                                <div><b class="text-[15px] font-bold text-slate-800">${v.name}</b><p class="text-[10px] text-green-500 font-bold uppercase tracking-tighter mt-0.5">Premium Service</p></div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-slate-200 text-sm"></i>
+                        </div>`;
+
+                    aBox.innerHTML += `
+                        <div class="card bg-white border-2 border-slate-50">
+                            <div class="flex justify-between items-center mb-4"><b>${v.name}</b> <i onclick="delV('${id}')" class="fa-solid fa-trash-can text-rose-400 p-2"></i></div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <input type="text" id="p1n-${id}" value="${v.p1n||''}" placeholder="Plan Name" class="input-box p-3 text-xs mb-0">
+                                <input type="number" id="p1p-${id}" value="${v.p1p||''}" placeholder="Price" class="input-box p-3 text-xs mb-0">
+                            </div>
+                            <button onclick="saveV('${id}')" class="w-full bg-slate-800 text-white p-3 rounded-xl text-[11px] font-bold mt-3">Update Plan</button>
+                        </div>`;
                 });
             });
 
@@ -174,54 +210,65 @@
                 uBox.innerHTML = ''; aBox.innerHTML = '';
                 const d = s.val(); if(d) Object.keys(d).forEach(id => {
                     const o = d[id];
-                    if(o.st === "Pending") aBox.innerHTML += `<div class="card text-xs"><b>User: ${o.user}</b><p>${o.vpn} - ${o.trx}</p><button onclick="approve('${id}')" class="bg-emerald-500 text-white p-2 rounded-lg w-full mt-2">Approve</button></div>`;
-                    if(o.uid == UID) uBox.innerHTML += `<div class="card flex justify-between items-center"><div><b class="text-sm">${o.vpn}</b><p class="text-[10px]">${o.plan} • ৳${o.price}</p></div><span class="text-[9px] font-bold uppercase px-3 py-1 rounded-full ${o.st==='Approved'?'bg-emerald-100 text-emerald-600':'bg-amber-100 text-amber-600'}">${o.st}</span></div>`;
+                    if(o.st === "Pending") aBox.innerHTML += `<div class="card text-xs bg-amber-50 border-amber-100 flex justify-between items-center"><div><b>${o.user}</b><p>${o.vpn} - ${o.trx}</p></div><button onclick="approve('${id}')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold">APPROVE</button></div>`;
+                    if(o.uid == UID) uBox.innerHTML += `<div class="card flex justify-between items-center"><div><b class="text-sm">${o.vpn}</b><p class="text-[10px] text-slate-400 font-bold">${o.plan} • ৳${o.price}</p></div><span class="text-[9px] font-black uppercase px-4 py-2 rounded-xl ${o.st==='Approved'?'bg-emerald-100 text-emerald-600':'bg-amber-100 text-amber-600'}">${o.st}</span></div>`;
                 });
             });
         }
 
-        // --- FUNCTIONS ---
         window.nav = (p, btn) => {
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
             btn.classList.add('nav-active');
             ['store','history','help'].forEach(s => document.getElementById(s+'-page').classList.add('hidden'));
             document.getElementById(p+'-page').classList.remove('hidden');
         };
+
         window.openAdmin = () => document.getElementById('admin-panel').classList.remove('hidden');
         window.closeAdmin = () => document.getElementById('admin-panel').classList.add('hidden');
+        
         window.addVpn = () => {
             const n = document.getElementById('v-name').value;
             if(!n) return;
-            const logo = `https://logo.clearbit.com/${n.toLowerCase().replace(/\s/g, '')}.com?size=100`;
-            push(ref(db, 'vpns'), { name: n, logo }).then(() => { document.getElementById('v-name').value = ''; });
+            push(ref(db, 'vpns'), { name: n }).then(() => { 
+                document.getElementById('v-name').value = ''; 
+            });
         };
-        window.saveV = (id) => update(ref(db, `vpns/${id}`), { p1n: document.getElementById(`p1n-${id}`).value, p1p: document.getElementById(`p1p-${id}`).value });
+
+        window.saveV = (id) => update(ref(db, `vpns/${id}`), { 
+            p1n: document.getElementById(`p1n-${id}`).value, 
+            p1p: document.getElementById(`p1p-${id}`).value 
+        });
+
         window.delV = (id) => remove(ref(db, `vpns/${id}`));
         window.approve = (id) => update(ref(db, `orders/${id}`), { st: "Approved" });
+
         window.openP = (id) => {
             onValue(ref(db, `vpns/${id}`), (s) => {
                 const v = s.val(); curVpn = v.name;
                 const box = document.getElementById('plan-content');
-                box.innerHTML = `<h3 class="font-bold text-xl mb-4">${v.name}</h3>`;
-                if(v.p1n) box.innerHTML += `<div onclick="goP('${v.p1n}','${v.p1p}')" class="card bg-slate-50 border-none flex justify-between font-bold py-5"><span>${v.p1n}</span><span class="text-indigo-600">৳${v.p1p}</span></div>`;
+                box.innerHTML = `<h3 class="font-black text-2xl mb-6 text-slate-800">${v.name}</h3>`;
+                if(v.p1n) box.innerHTML += `<div onclick="goP('${v.p1n}','${v.p1p}')" class="card bg-slate-50 border-none flex justify-between font-bold py-6 items-center"><span>${v.p1n}</span><span class="text-indigo-600 bg-white px-5 py-2 rounded-2xl shadow-sm border border-indigo-50">৳${v.p1p}</span></div>`;
                 document.getElementById('plan-modal').style.display = 'flex';
             }, {onlyOnce: true});
         };
+
         window.goP = (n, p) => {
             curPlan = n; curPrice = p;
             document.getElementById('plan-modal').style.display = 'none';
             document.getElementById('target-price').innerText = "৳" + p;
             document.getElementById('pay-modal').style.display = 'flex';
         };
+
         window.orderNow = () => {
             const trx = document.getElementById('trx-id').value;
-            if(!trx) return;
-            push(ref(db, 'orders'), { vpn: curVpn, plan: curPlan, price: curPrice, trx, uid: UID, user: UNAME, st: "Pending" }).then(() => {
-                Swal.fire('Success', 'Order Placed!', 'success');
+            if(!trx) return Swal.fire({title:'Missing TrxID', text:'Please enter payment transaction ID', icon:'error'});
+            push(ref(db, 'orders'), { vpn: curVpn, plan: curPlan, price: curPrice, trx: trx.toUpperCase(), uid: UID, user: UNAME, st: "Pending" }).then(() => {
+                Swal.fire({title:'Success!', text:'Order under review.', icon:'success', confirmButtonColor:'#6366f1'});
                 document.getElementById('pay-modal').style.display = 'none';
                 document.getElementById('trx-id').value = '';
             });
         };
+
         window.onclick = (e) => { if(e.target.className === 'modal') e.target.style.display = 'none'; }
     </script>
 </body>
