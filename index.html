@@ -32,7 +32,7 @@
         .adm-tab { flex: 1; padding: 12px; font-size: 11px; font-weight: 800; color: #64748b; border-radius: 14px; text-align: center; }
         .adm-tab-active { background: #fff; color: #6366f1; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
         
-        .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(8px); z-index: 2000; display: none; align-items: flex-end; justify-content: center; }
+        .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(8px); z-index: 6000; display: none; align-items: flex-end; justify-content: center; }
         .sheet { background: #fff; width: 100%; max-width: 450px; border-radius: 35px 35px 0 0; padding: 30px; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
@@ -150,6 +150,27 @@
     </div>
 
     <div id="plan-modal" class="modal"><div class="sheet" id="plan-content"></div></div>
+    
+    <div id="approve-modal" class="modal">
+        <div class="sheet">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-black text-xl">Deliver Account</h3>
+                <button onclick="closeApprove()" class="text-slate-400"><i class="fa-solid fa-circle-xmark text-2xl"></i></button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <p class="text-[10px] font-black uppercase text-slate-400 ml-1 mb-1">Email / ID</p>
+                    <input type="text" id="adm-deliver-email" placeholder="example@gmail.com" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-indigo-500 font-bold">
+                </div>
+                <div>
+                    <p class="text-[10px] font-black uppercase text-slate-400 ml-1 mb-1">Password</p>
+                    <input type="text" id="adm-deliver-pass" placeholder="••••••••" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-indigo-500 font-bold">
+                </div>
+                <button id="final-approve-btn" class="btn-p mt-4">Complete Delivery</button>
+            </div>
+        </div>
+    </div>
+
     <div id="pay-modal" class="modal">
         <div class="sheet text-center">
             <h3 class="font-black text-xl mb-6">Payment</h3>
@@ -199,7 +220,6 @@
             setTimeout(() => { document.getElementById('loading-screen').style.opacity = '0'; setTimeout(()=> document.getElementById('loading-screen').style.display='none', 800); }, 2500);
         };
 
-        // Google Favicon API Logic
         function getAutoLogo(name) {
             const domain = name.toLowerCase().replace(/\s+/g, '') + ".com";
             return `https://www.google.com/s2/favicons?sz=128&domain=${domain}`;
@@ -219,7 +239,6 @@
                     const v = d[id], isOff = v.status === "OFF", logo = getAutoLogo(v.name);
                     uBox.innerHTML += `
                     <div onclick="${isOff ? '' : `openPlans('${id}')`}" class="card flex justify-between items-center bg-white ${isOff ? 'opacity-60' : 'active:scale-95'}">
-                        ${isOff ? '<span class="text-[9px] font-black text-rose-500 bg-rose-50 px-2 py-1 rounded">OFF</span>' : ''}
                         <div class="flex items-center gap-4">
                             <img src="${logo}" class="vpn-icon-main" onerror="this.src='https://ui-avatars.com/api/?name=${v.name}&background=6366f1&color=fff'">
                             <b class="text-sm">${v.name}</b>
@@ -268,7 +287,7 @@
                             <div class="flex justify-between items-start"><div><b>${o.user}</b><p class="text-[10px] text-slate-400">${o.vpn} - ${o.plan}</p></div><b class="text-indigo-600">৳${o.price}</b></div>
                             <div class="trx-box" onclick="copyText('${o.trx}')">${o.trx}</div>
                             <div class="flex gap-2">
-                                <button onclick="approveAction('${id}')" class="flex-1 bg-emerald-500 text-white py-2 rounded-xl text-[10px] font-black">APPROVE</button>
+                                <button onclick="openApprove('${id}')" class="flex-1 bg-emerald-500 text-white py-2 rounded-xl text-[10px] font-black">APPROVE</button>
                                 <button onclick="rejectAction('${id}')" class="flex-1 bg-rose-500 text-white py-2 rounded-xl text-[10px] font-black">REJECT</button>
                             </div>
                         </div>`;
@@ -292,11 +311,35 @@
             });
         }
 
-        window.saveSupport = () => set(ref(db, 'supportUrl'), document.getElementById('set-support-url').value).then(()=> Swal.fire('Link Saved!', '', 'success'));
-        window.approveAction = async (id) => {
-            const { value: f } = await Swal.fire({ title: 'Deliver Account', html: '<input id="sw-m" placeholder="ID/Email" class="swal2-input"><input id="sw-p" placeholder="Password" class="swal2-input">', preConfirm: () => ({ e: document.getElementById('sw-m').value, p: document.getElementById('sw-p').value }) });
-            if(f && f.e) update(ref(db, `orders/${id}`), { st: "Approved", email: f.e, pass: f.p });
+        // New Approve Logic
+        let activeOrderId = null;
+        window.openApprove = (id) => {
+            activeOrderId = id;
+            document.getElementById('adm-deliver-email').value = '';
+            document.getElementById('adm-deliver-pass').value = '';
+            document.getElementById('approve-modal').style.display = 'flex';
         };
+
+        window.closeApprove = () => {
+            document.getElementById('approve-modal').style.display = 'none';
+        };
+
+        document.getElementById('final-approve-btn').onclick = () => {
+            const email = document.getElementById('adm-deliver-email').value;
+            const pass = document.getElementById('adm-deliver-pass').value;
+            if(!email || !pass) return Swal.fire('Error', 'Puron korun!', 'error');
+            
+            update(ref(db, `orders/${activeOrderId}`), { 
+                st: "Approved", 
+                email: email, 
+                pass: pass 
+            }).then(() => {
+                closeApprove();
+                Swal.fire({ title: 'Delivered!', icon: 'success', timer: 1000, showConfirmButton: false });
+            });
+        };
+
+        window.saveSupport = () => set(ref(db, 'supportUrl'), document.getElementById('set-support-url').value).then(()=> Swal.fire('Link Saved!', '', 'success'));
         window.rejectAction = (id) => update(ref(db, `orders/${id}`), { st: "Cancelled" });
         window.nav = (p, btn) => {
             document.querySelectorAll('nav button').forEach(b => b.classList.replace('text-indigo-600', 'text-slate-400'));
@@ -316,7 +359,7 @@
         window.openPlans = (id) => {
             onValue(ref(db,`vpns/${id}`), (s) => {
                 const v = s.val(); curV = v.name;
-                let h = `<h3 class="font-black text-2xl mb-6">${v.name}</h3>`;
+                let h = `<div class="flex justify-between items-center mb-6"><h3 class="font-black text-2xl">${v.name}</h3> <button onclick="this.closest('.modal').style.display='none'"><i class="fa-solid fa-circle-xmark text-2xl text-slate-200"></i></button></div>`;
                 if(v.p1n) h += `<div onclick="goPay('${v.p1n}','${v.p1p}')" class="card bg-indigo-50/50 flex justify-between mb-3 border-indigo-100 p-5 font-bold"><span>${v.p1n}</span><b class="text-indigo-600">৳${v.p1p}</b></div>`;
                 if(v.p2n) h += `<div onclick="goPay('${v.p2n}','${v.p2p}')" class="card bg-indigo-50/50 flex justify-between mb-3 border-indigo-100 p-5 font-bold"><span>${v.p2n}</span><b class="text-indigo-600">৳${v.p2p}</b></div>`;
                 document.getElementById('plan-content').innerHTML = h; document.getElementById('plan-modal').style.display = 'flex';
