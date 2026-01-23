@@ -17,22 +17,17 @@
         #loading-screen { position: fixed; inset: 0; background: #fff; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.8s; }
         .card { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border-radius: 24px; padding: 16px; border: 1px solid rgba(255,255,255,0.8); position: relative; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.03); }
         .btn-p { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); color: #fff; width: 100%; padding: 16px; border-radius: 20px; font-weight: 800; font-size: 14px; box-shadow: 0 10px 20px -5px rgba(30,27,75,0.3); }
-        .adm-nav { display: flex; background: #f1f5f9; padding: 5px; border-radius: 18px; margin-bottom: 15px; }
-        .adm-tab { flex: 1; padding: 12px; font-size: 11px; font-weight: 800; color: #64748b; border-radius: 14px; text-align: center; }
+        .adm-nav { display: flex; background: #f1f5f9; padding: 5px; border-radius: 18px; margin-bottom: 15px; flex-wrap: wrap; gap: 4px; }
+        .adm-tab { flex: 1; min-width: 80px; padding: 12px 8px; font-size: 10px; font-weight: 800; color: #64748b; border-radius: 14px; text-align: center; }
         .adm-tab-active { background: #fff; color: #6366f1; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
         .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(8px); z-index: 6000; display: none; align-items: flex-end; justify-content: center; }
-        .sheet { background: #fff; width: 100%; max-width: 450px; border-radius: 35px 35px 0 0; padding: 30px; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .sheet { background: #fff; width: 100%; max-width: 450px; border-radius: 35px 35px 0 0; padding: 30px; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); max-height: 85vh; overflow-y: auto; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         .trx-box { background: #f0f7ff; border: 2px dashed #6366f1; padding: 10px; border-radius: 14px; font-family: monospace; color: #4338ca; font-weight: 800; margin: 8px 0; text-align: center; font-size: 13px; }
-        .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; inset: 0; background-color: #cbd5e1; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: #6366f1; }
-        input:checked + .slider:before { transform: translateX(18px); }
-        .vpn-icon-main { width: 50px; height: 50px; border-radius: 16px; object-fit: cover; background: #fff; padding: 4px; border: 1px solid #f1f5f9; }
         .adm-mini-input { width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px; font-size: 11px; font-weight: 600; outline: none; }
-        .adm-mini-input:focus { border-color: #6366f1; }
+        .stock-item-btn { width: 100%; text-align: left; background: #f1f5f9; padding: 12px; border-radius: 15px; border: 1px solid #e2e8f0; margin-bottom: 8px; }
+        .disabled-card { opacity: 0.5; pointer-events: none; filter: grayscale(1); }
+        .vpn-logo { width: 45px; height: 45px; border-radius: 14px; object-fit: cover; }
     </style>
 </head>
 <body>
@@ -84,7 +79,7 @@
                     <i class="fa-brands fa-telegram text-5xl text-indigo-500"></i>
                 </div>
                 <h4 class="font-black text-xl">Contact Support</h4>
-                <a id="support-link" href="#" class="btn-p block mt-8">Message Admin</a>
+                <a id="support-link" href="#" target="_blank" class="btn-p block mt-8">Message Admin</a>
             </div>
         </main>
 
@@ -103,47 +98,62 @@
         <div class="p-5 bg-white shadow-sm">
             <div class="adm-nav">
                 <button onclick="admTab('pending', this)" class="adm-tab adm-tab-active">PENDING (<span id="p-count">0</span>)</button>
+                <button onclick="admTab('stock', this)" class="adm-tab">VPN STOCK</button>
+                <button onclick="admTab('settings', this)" class="adm-tab">SETTINGS</button>
                 <button onclick="admTab('history', this)" class="adm-tab">HISTORY</button>
-                <button onclick="admTab('settings', this)" class="adm-tab">SETUP</button>
             </div>
         </div>
         <div class="p-5 overflow-y-auto flex-1">
             <div id="adm-pending" class="adm-content space-y-4"></div>
-            <div id="adm-history" class="adm-content hidden space-y-3"></div>
+            <div id="adm-stock" class="adm-content hidden space-y-6">
+                <div class="card space-y-4">
+                    <b class="text-indigo-600 text-sm">Add New Stock</b>
+                    <input type="text" id="stock-email" placeholder="Email / ID" class="adm-mini-input">
+                    <input type="text" id="stock-pass" placeholder="Password" class="adm-mini-input">
+                    <select id="stock-vpn-id" class="adm-mini-input"></select>
+                    <button onclick="addStock()" class="btn-p py-3 text-xs">Add to Stock</button>
+                </div>
+                <div id="stock-status-list" class="space-y-2"></div>
+            </div>
             <div id="adm-settings" class="adm-content hidden space-y-6">
                 <div class="card space-y-3">
                     <b class="text-[10px] uppercase">Support Link</b>
-                    <input type="text" id="set-support-url" placeholder="https://t.me/yourname" class="adm-mini-input">
+                    <input type="text" id="set-support-url" placeholder="https://t.me/username" class="adm-mini-input">
                     <button onclick="saveSupport()" class="btn-p py-3 text-xs">Save Link</button>
                 </div>
-                <div class="card space-y-3 border-dashed border-2">
-                    <b class="text-[10px] uppercase">Add New Service</b>
-                    <input type="text" id="v-name" placeholder="Name (e.g. NordVPN)" class="adm-mini-input">
-                    <button onclick="addVpn()" class="btn-p py-3 text-xs">Add VPN</button>
+                <div class="card space-y-3">
+                    <b class="text-[10px] uppercase">New VPN</b>
+                    <input type="text" id="v-name" placeholder="VPN Name" class="adm-mini-input">
+                    <button onclick="addVpn()" class="btn-p py-3 text-xs">Create VPN</button>
                 </div>
                 <div id="adm-vpn-list" class="space-y-3"></div>
                 <div class="card space-y-4">
-                    <b class="text-[10px] uppercase text-slate-400">Payment Methods</b>
-                    <div class="flex gap-2"><input type="text" id="pay-name" placeholder="Bkash" class="w-1/2 adm-mini-input"><input type="text" id="pay-num-in" placeholder="017..." class="w-1/2 adm-mini-input"></div>
+                    <b class="text-[10px] uppercase">Payment Methods</b>
+                    <div class="flex gap-2">
+                        <input type="text" id="pay-name" placeholder="Bkash" class="w-1/2 adm-mini-input">
+                        <input type="text" id="pay-num-in" placeholder="017..." class="w-1/2 adm-mini-input">
+                    </div>
                     <button onclick="addPay()" class="btn-p py-3 text-xs bg-slate-800">Add Method</button>
-                    <div id="pay-list" class="space-y-2 mt-4"></div>
+                    <div id="pay-list" class="space-y-2 mt-2"></div>
                 </div>
             </div>
+            <div id="adm-history" class="adm-content hidden space-y-3"></div>
         </div>
     </div>
 
     <div id="plan-modal" class="modal"><div class="sheet" id="plan-content"></div></div>
+    <div id="stock-select-modal" class="modal"><div class="sheet" id="stock-select-content"></div></div>
     <div id="pay-modal" class="modal">
         <div class="sheet text-center">
             <h3 class="font-black text-xl mb-6">Payment</h3>
             <div id="user-pay-options" class="grid grid-cols-2 gap-3 mb-6"></div>
             <div id="pay-details" class="hidden">
-                <div class="bg-indigo-50 p-6 rounded-3xl border border-indigo-100 mb-6" onclick="copyText(document.getElementById('active-num').innerText)">
-                    <p class="text-[9px] font-bold text-indigo-400 mb-2 uppercase">Tap to Copy Number</p>
+                <div class="bg-indigo-50 p-6 rounded-3xl mb-6" onclick="copyText(document.getElementById('active-num').innerText)">
+                    <p class="text-[9px] font-bold text-indigo-400 mb-2 uppercase">Tap to Copy</p>
                     <b id="active-num" class="text-2xl text-indigo-700 tracking-wider"></b>
                 </div>
                 <b id="target-price" class="text-xl block mb-6 text-indigo-600"></b>
-                <input type="text" id="trx-id" placeholder="Transaction ID (TrxID)" class="w-full p-4 border-2 border-slate-100 rounded-2xl text-center uppercase font-black mb-4 focus:border-indigo-400 outline-none">
+                <input type="text" id="trx-id" placeholder="TrxID (e.g. 8N56X9)" class="w-full p-4 border-2 rounded-2xl text-center uppercase font-black mb-4 focus:border-indigo-500 outline-none">
                 <button onclick="orderNow()" class="btn-p">Confirm Order</button>
             </div>
         </div>
@@ -151,7 +161,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, onValue, push, remove, update, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, onValue, push, remove, update, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDZQHw4-DdUdDmJXcuK_88JrJxv35FfYeY",
@@ -170,7 +180,7 @@
 
         const UID = tg.initDataUnsafe?.user?.id || "0000";
         const UNAME = tg.initDataUnsafe?.user?.first_name || "Guest";
-        const UPHOTO = tg.initDataUnsafe?.user?.photo_url || `https://ui-avatars.com/api/?background=6366f1&color=fff&name=${UNAME}`;
+        const UPHOTO = tg.initDataUnsafe?.user?.photo_url || `https://ui-avatars.com/api/?name=${UNAME}&background=6366f1&color=fff`;
         const ADMINS = ["8505710811", "7940769450"];
 
         window.onload = () => {
@@ -179,44 +189,50 @@
             document.getElementById('u-pic').src = UPHOTO;
             if(ADMINS.includes(UID.toString())) document.getElementById('admin-btn').classList.remove('hidden');
             sync();
-            setTimeout(() => { document.getElementById('loading-screen').style.opacity = '0'; setTimeout(()=> document.getElementById('loading-screen').style.display='none', 800); }, 2000);
+            setTimeout(() => document.getElementById('loading-screen').style.display='none', 1200);
         };
 
-        function getAutoLogo(name) {
-            const domain = name.toLowerCase().replace(/\s+/g, '') + ".com";
-            return `https://www.google.com/s2/favicons?sz=128&domain=${domain}`;
+        function getLogo(name) {
+            return `https://www.google.com/s2/favicons?sz=128&domain=${name.toLowerCase().replace(/\s/g, '')}.com`;
         }
 
         function sync() {
             onValue(ref(db, 'supportUrl'), (s) => {
                 const url = s.val() || "#";
                 document.getElementById('support-link').href = url;
-                document.getElementById('set-support-url').value = (url === "#") ? "" : url;
+                document.getElementById('set-support-url').value = url;
             });
 
             onValue(ref(db, 'vpns'), (s) => {
-                const uBox = document.getElementById('vpn-list'), aBox = document.getElementById('adm-vpn-list');
-                uBox.innerHTML = ''; aBox.innerHTML = '';
+                const uBox = document.getElementById('vpn-list'), aBox = document.getElementById('adm-vpn-list'), sSelect = document.getElementById('stock-vpn-id'), sStatus = document.getElementById('stock-status-list');
+                uBox.innerHTML = ''; aBox.innerHTML = ''; sSelect.innerHTML = ''; sStatus.innerHTML = '';
                 const d = s.val(); if(d) Object.keys(d).forEach(id => {
-                    const v = d[id], isOff = v.status === "OFF", logo = getAutoLogo(v.name);
-                    uBox.innerHTML += `<div onclick="${isOff ? '' : `openPlans('${id}')`}" class="card flex justify-between items-center bg-white ${isOff ? 'opacity-60' : 'active:scale-95'}"><div class="flex items-center gap-4"><img src="${logo}" class="vpn-icon-main" onerror="this.src='https://ui-avatars.com/api/?name=${v.name}&background=6366f1&color=fff'"><b class="text-sm">${v.name}</b></div><i class="fa-solid fa-chevron-right text-slate-200"></i></div>`;
-                    aBox.innerHTML += `
-                    <div class="card space-y-4">
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center gap-2"><img src="${logo}" class="w-8 h-8 rounded-lg"><b>${v.name}</b></div>
-                            <div class="flex gap-3 items-center">
-                                <label class="switch"><input type="checkbox" ${!isOff?'checked':''} onchange="updateVpnStatus('${id}',this.checked)"><span class="slider"></span></label>
-                                <i onclick="delV('${id}')" class="fa-solid fa-trash text-rose-300"></i>
+                    const v = d[id], count = v.stock ? Object.keys(v.stock).length : 0;
+                    
+                    // User View: Stock out thakle faded ebong unclickable
+                    uBox.innerHTML += `
+                        <div onclick="${count > 0 ? `openPlans('${id}')` : ''}" class="card flex justify-between items-center bg-white ${count === 0 ? 'disabled-card' : 'active:scale-95 transition'}">
+                            <div class="flex items-center gap-4">
+                                <img src="${getLogo(v.name)}" class="vpn-logo" onerror="this.src='https://ui-avatars.com/api/?name=${v.name}'">
+                                <b>${v.name}</b>
                             </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <input type="text" id="p1n-${id}" value="${v.p1n||''}" placeholder="Plan 1 Name" class="adm-mini-input">
-                            <input type="number" id="p1p-${id}" value="${v.p1p||''}" placeholder="Price" class="adm-mini-input">
-                            <input type="text" id="p2n-${id}" value="${v.p2n||''}" placeholder="Plan 2 Name" class="adm-mini-input">
-                            <input type="number" id="p2p-${id}" value="${v.p2p||''}" placeholder="Price" class="adm-mini-input">
-                        </div>
-                        <button onclick="saveV('${id}')" class="w-full bg-slate-800 text-white p-2 rounded-xl text-[10px] font-bold uppercase">Update Service</button>
-                    </div>`;
+                            <span class="text-[10px] font-black px-3 py-1 rounded-lg ${count > 0 ? 'bg-emerald-50 text-emerald-500' : 'bg-rose-50 text-rose-500'}">
+                                ${count > 0 ? 'IN STOCK' : 'OUT OF STOCK'}
+                            </span>
+                        </div>`;
+
+                    aBox.innerHTML += `
+                        <div class="card space-y-4">
+                            <div class="flex justify-between"><b>${v.name}</b> <i onclick="delV('${id}')" class="fa-solid fa-trash text-rose-300"></i></div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="text" id="p1n-${id}" value="${v.p1n||''}" placeholder="Plan 1" class="adm-mini-input">
+                                <input type="number" id="p1p-${id}" value="${v.p1p||''}" placeholder="Price" class="adm-mini-input">
+                            </div>
+                            <button onclick="saveV('${id}')" class="btn-p py-2 text-[10px]">Save Details</button>
+                        </div>`;
+                    
+                    sSelect.innerHTML += `<option value="${id}">${v.name}</option>`;
+                    sStatus.innerHTML += `<div class="card flex justify-between bg-white text-xs"><b>${v.name}</b> <span>${count} Accounts</span></div>`;
                 });
             });
 
@@ -227,32 +243,32 @@
                 const d = s.val(); if(d) Object.keys(d).forEach(id => {
                     const o = d[id];
                     if(o.uid == UID) {
-                        uBox.innerHTML += `<div class="card space-y-3"><div class="flex justify-between items-center"><div><b>${o.vpn}</b><p class="text-[10px] text-slate-400 font-bold">${o.plan} • ৳${o.price}</p></div><span class="text-[10px] font-black px-3 py-1 rounded-lg ${o.st==='Approved'?'bg-emerald-50 text-emerald-500':o.st==='Cancelled'?'bg-rose-50 text-rose-500':'bg-amber-50 text-amber-500'}">${o.st}</span></div>${o.email ? `<div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-50 space-y-2 text-[11px]"><p onclick="copyText('${o.email}')">Email: <b>${o.email}</b></p><p onclick="copyText('${o.pass}')">Pass: <b>${o.pass}</b></p></div>` : ''}</div>`;
+                        uBox.innerHTML += `
+                        <div class="card space-y-3">
+                            <div class="flex justify-between items-center">
+                                <div><b>${o.vpn}</b><p class="text-[10px] text-slate-400 font-bold">${o.plan} • ৳${o.price}</p></div>
+                                <span class="text-[10px] font-black px-3 py-1 rounded-lg ${o.st==='Approved'?'bg-emerald-50 text-emerald-500':'bg-amber-50 text-amber-500'}">${o.st}</span>
+                            </div>
+                            ${o.email ? `<div class="bg-indigo-50 p-4 rounded-xl text-[11px] font-bold">Email: ${o.email}<br>Pass: ${o.pass}</div>` : ''}
+                        </div>`;
                     }
                     if(o.st === "Pending") {
                         pCount++;
                         aP.innerHTML += `
                         <div class="card space-y-3">
-                            <div class="flex justify-between items-start"><div><b>${o.user}</b><p class="text-[10px] text-slate-400">${o.vpn} (${o.plan})</p></div><b class="text-indigo-600">৳${o.price}</b></div>
+                            <div class="flex justify-between"><div><b>${o.user}</b><p class="text-[10px]">${o.vpn} (${o.plan})</p></div><b class="text-indigo-600">৳${o.price}</b></div>
                             <div class="flex flex-col gap-1">
-                                <span class="text-[9px] font-black text-slate-400 uppercase ml-1">Method: ${o.method || 'Not Specified'}</span>
+                                <span class="text-[9px] font-black text-slate-400">Method: ${o.method || 'Unknown'}</span>
                                 <div class="trx-box" onclick="copyText('${o.trx}')">TRX: ${o.trx}</div>
                             </div>
-                            <div class="space-y-2">
-                                <input type="text" id="dl-e-${id}" placeholder="Email / ID" class="adm-mini-input">
-                                <input type="text" id="dl-p-${id}" placeholder="Password" class="adm-mini-input">
-                            </div>
-                            <div class="flex gap-2">
-                                <button onclick="approveDirect('${id}')" class="flex-1 bg-emerald-500 text-white py-2 rounded-xl text-[10px] font-black uppercase">Approve</button>
-                                <button onclick="rejectAction('${id}')" class="flex-1 bg-rose-500 text-white py-2 rounded-xl text-[10px] font-black uppercase">Reject</button>
-                            </div>
+                            <button onclick="showStockList('${id}','${o.vpn_id}')" class="btn-p py-3 text-[10px]">CHOOSE FROM STOCK</button>
                         </div>`;
                     } else {
-                        aH.innerHTML += `<div class="card flex justify-between items-center text-[10px] opacity-60"><span><b>${o.user}</b> - ${o.vpn} (${o.st})</span><button onclick="delO('${id}')" class="text-rose-400 px-2"><i class="fa-solid fa-trash-can"></i></button></div>`;
+                        aH.innerHTML += `<div class="card text-[10px] opacity-60 flex justify-between items-center py-2"><span>${o.user} - ${o.vpn} (${o.st})</span><i onclick="delO('${id}')" class="fa-solid fa-trash"></i></div>`;
                     }
                 });
                 document.getElementById('p-count').innerText = pCount;
-                if(pCount > 0) { document.getElementById('p-count-badge').classList.remove('hidden'); document.getElementById('p-count-badge').innerText = pCount; }
+                if(pCount > 0) document.getElementById('p-count-badge').classList.remove('hidden');
                 else document.getElementById('p-count-badge').classList.add('hidden');
             });
 
@@ -260,21 +276,46 @@
                 const uP = document.getElementById('user-pay-options'), pL = document.getElementById('pay-list');
                 uP.innerHTML = ''; pL.innerHTML = '';
                 const d = s.val(); if(d) Object.keys(d).forEach(id => {
-                    const p = d[id];
-                    pL.innerHTML += `<div class="flex justify-between items-center bg-white p-3 rounded-xl border text-[10px] font-bold"><span>${p.name}: ${p.num}</span><i onclick="delPay('${id}')" class="fa-solid fa-circle-xmark text-rose-300"></i></div>`;
-                    uP.innerHTML += `<div onclick="setPay('${p.name}','${p.num}')" class="p-4 border-2 border-slate-100 rounded-2xl font-black text-[10px] uppercase active:border-indigo-500 transition-all">${p.name}</div>`;
+                    uP.innerHTML += `<div onclick="setPay('${d[id].name}','${d[id].num}')" class="p-4 border-2 rounded-2xl font-black text-[10px] uppercase">${d[id].name}</div>`;
+                    pL.innerHTML += `<div class="flex justify-between bg-slate-50 p-2 rounded-lg text-[10px]"><span>${d[id].name}: ${d[id].num}</span><i onclick="delPay('${id}')" class="fa-solid fa-times-circle text-rose-400"></i></div>`;
                 });
             });
         }
 
-        window.approveDirect = (id) => {
-            const e = document.getElementById(`dl-e-${id}`).value, p = document.getElementById(`dl-p-${id}`).value;
-            if(!e || !p) return Swal.fire('Error', 'ID/Pass likhun!', 'error');
-            update(ref(db, `orders/${id}`), { st: "Approved", email: e, pass: p }).then(() => Swal.fire('Delivered!', '', 'success'));
+        window.showStockList = async (orderId, vpnId) => {
+            const snap = await get(ref(db, `vpns/${vpnId}/stock`));
+            const content = document.getElementById('stock-select-content');
+            let h = `<div class="flex justify-between items-center mb-6"><h3 class="font-black text-xl">Select Account</h3><button onclick="this.closest('.modal').style.display='none'"><i class="fa-solid fa-times text-xl"></i></button></div>`;
+            if(snap.exists()) {
+                const stocks = snap.val();
+                Object.keys(stocks).forEach(sk => {
+                    h += `<button class="stock-item-btn" onclick="approveSelected('${orderId}','${vpnId}','${sk}')">
+                        <div class="text-[12px] font-bold text-slate-700">${stocks[sk].email}</div>
+                        <div class="text-[10px] text-slate-400">${stocks[sk].pass}</div>
+                    </button>`;
+                });
+            } else h += `<p class="text-rose-500 font-bold text-center py-10">No accounts in stock!</p>`;
+            content.innerHTML = h; document.getElementById('stock-select-modal').style.display = 'flex';
         };
 
-        window.saveSupport = () => set(ref(db, 'supportUrl'), document.getElementById('set-support-url').value).then(()=> Swal.fire('Link Saved!', '', 'success'));
-        window.rejectAction = (id) => update(ref(db, `orders/${id}`), { st: "Cancelled" });
+        window.approveSelected = async (orderId, vpnId, stockKey) => {
+            const snap = await get(ref(db, `vpns/${vpnId}/stock/${stockKey}`));
+            const item = snap.val();
+            update(ref(db, `orders/${orderId}`), { st: "Approved", email: item.email, pass: item.pass }).then(() => {
+                remove(ref(db, `vpns/${vpnId}/stock/${stockKey}`));
+                document.getElementById('stock-select-modal').style.display = 'none';
+                Swal.fire('Approved!', 'Order delivered successfully.', 'success');
+            });
+        };
+
+        window.addStock = () => {
+            const e = document.getElementById('stock-email').value, p = document.getElementById('stock-pass').value, vid = document.getElementById('stock-vpn-id').value;
+            if(e && p) push(ref(db, `vpns/${vid}/stock`), { email: e, pass: p }).then(() => {
+                document.getElementById('stock-email').value = ''; document.getElementById('stock-pass').value = '';
+                Swal.fire({title: 'Added!', icon: 'success', toast: true, position: 'top', showConfirmButton: false, timer: 1500});
+            });
+        };
+
         window.nav = (p, btn) => {
             document.querySelectorAll('nav button').forEach(b => b.classList.replace('text-indigo-600', 'text-slate-400'));
             btn.classList.replace('text-slate-400', 'text-indigo-600');
@@ -287,55 +328,43 @@
             document.querySelectorAll('.adm-content').forEach(c => c.classList.add('hidden'));
             document.getElementById('adm-'+t).classList.remove('hidden');
         };
-        window.copyText = (t) => { navigator.clipboard.writeText(t); tg.HapticFeedback.notificationOccurred('success'); Swal.fire({ title: 'Copied!', icon: 'success', toast: true, position: 'top', showConfirmButton: false, timer: 1000 }); };
 
-        let curV, curPl, curPr, curMethod;
+        let curV, curPl, curPr, curVid, curMethod;
         window.openPlans = (id) => {
-            onValue(ref(db,`vpns/${id}`), (s) => {
-                const v = s.val(); curV = v.name;
-                let h = `<div class="flex justify-between items-center mb-6"><h3 class="font-black text-2xl">${v.name}</h3> <button onclick="this.closest('.modal').style.display='none'"><i class="fa-solid fa-circle-xmark text-2xl text-slate-200"></i></button></div>`;
-                if(v.p1n) h += `<div onclick="goPay('${v.p1n}','${v.p1p}')" class="card bg-indigo-50/50 flex justify-between mb-3 border-indigo-100 p-5 font-bold"><span>${v.p1n}</span><b class="text-indigo-600">৳${v.p1p}</b></div>`;
-                if(v.p2n) h += `<div onclick="goPay('${v.p2n}','${v.p2p}')" class="card bg-indigo-50/50 flex justify-between mb-3 border-indigo-100 p-5 font-bold"><span>${v.p2n}</span><b class="text-indigo-600">৳${v.p2p}</b></div>`;
+            get(ref(db,`vpns/${id}`)).then(s => {
+                const v = s.val(); curV = v.name; curVid = id;
+                let h = `<div class="flex justify-between items-center mb-6"><h3 class="font-black text-2xl">${v.name}</h3><button onclick="this.closest('.modal').style.display='none'"><i class="fa-solid fa-times-circle text-slate-200 text-2xl"></i></button></div>`;
+                if(v.p1n) h += `<div onclick="goPay('${v.p1n}','${v.p1p}')" class="card bg-indigo-50 flex justify-between items-center mb-3 font-bold border-indigo-100 p-5"><span>${v.p1n}</span><b class="text-indigo-600">৳${v.p1p}</b></div>`;
                 document.getElementById('plan-content').innerHTML = h; document.getElementById('plan-modal').style.display = 'flex';
-            }, {onlyOnce:true});
-        };
-        window.goPay = (n, p) => { curPl = n; curPr = p; document.getElementById('plan-modal').style.display='none'; document.getElementById('pay-modal').style.display='flex'; document.getElementById('target-price').innerText = "Amount: ৳"+p; };
-        
-        window.setPay = (n, m) => { 
-            curMethod = n;
-            document.getElementById('active-num').innerText = m; 
-            document.getElementById('pay-details').classList.remove('hidden'); 
+            });
         };
 
+        window.goPay = (n, p) => { 
+            curPl = n; curPr = p; 
+            document.getElementById('plan-modal').style.display='none'; 
+            document.getElementById('pay-modal').style.display='flex'; 
+            document.getElementById('target-price').innerText = "Amount: ৳" + p;
+        };
+
+        window.setPay = (n, m) => { curMethod = n; document.getElementById('active-num').innerText = m; document.getElementById('pay-details').classList.remove('hidden'); };
+        
         window.orderNow = () => {
             const trx = document.getElementById('trx-id').value;
-            if(!trx) return;
-            push(ref(db, 'orders'), { 
-                vpn: curV, 
-                plan: curPl, 
-                price: curPr, 
-                trx: trx.toUpperCase(), 
-                method: curMethod,
-                uid: UID, 
-                user: UNAME, 
-                st: "Pending" 
-            }).then(() => {
-                Swal.fire('Success', 'Order Placed!', 'success');
+            if(!trx) return Swal.fire('Error', 'Enter TrxID', 'error');
+            push(ref(db, 'orders'), { vpn: curV, vpn_id: curVid, plan: curPl, price: curPr, trx: trx.toUpperCase(), method: curMethod, uid: UID, user: UNAME, st: "Pending" }).then(() => {
+                Swal.fire('Order Placed!', 'Admin will review it soon.', 'success'); 
                 document.getElementById('pay-modal').style.display = 'none';
                 document.getElementById('trx-id').value = '';
                 document.getElementById('pay-details').classList.add('hidden');
             });
         };
+
+        window.copyText = (t) => { navigator.clipboard.writeText(t); Swal.fire({title:'Copied!', icon:'success', toast:true, position:'top', showConfirmButton:false, timer:1000}); };
         window.openAdmin = () => document.getElementById('admin-panel').classList.remove('hidden');
         window.closeAdmin = () => document.getElementById('admin-panel').classList.add('hidden');
-        window.addVpn = () => { const n = document.getElementById('v-name').value; if(n) push(ref(db,'vpns'),{name:n,status:"ON"}); document.getElementById('v-name').value=''; };
-        window.saveV = (id) => update(ref(db,`vpns/${id}`), { 
-            p1n:document.getElementById(`p1n-${id}`).value, 
-            p1p:document.getElementById(`p1p-${id}`).value,
-            p2n:document.getElementById(`p2n-${id}`).value, 
-            p2p:document.getElementById(`p2p-${id}`).value 
-        }).then(()=> Swal.fire('Updated!', '', 'success'));
-        window.updateVpnStatus = (id, c) => update(ref(db,`vpns/${id}`), { status: c ? "ON" : "OFF" });
+        window.saveSupport = () => set(ref(db, 'supportUrl'), document.getElementById('set-support-url').value).then(()=>Swal.fire('Saved!','','success'));
+        window.addVpn = () => { const n = document.getElementById('v-name').value; if(n) push(ref(db,'vpns'),{name:n}); document.getElementById('v-name').value=''; };
+        window.saveV = (id) => update(ref(db,`vpns/${id}`), { p1n:document.getElementById(`p1n-${id}`).value, p1p:document.getElementById(`p1p-${id}`).value }).then(()=>Swal.fire('Updated!','','success'));
         window.delV = (id) => remove(ref(db,`vpns/${id}`));
         window.delO = (id) => remove(ref(db,`orders/${id}`));
         window.addPay = () => { const n = document.getElementById('pay-name').value, m = document.getElementById('pay-num-in').value; if(n&&m) push(ref(db,'payments'),{name:n,num:m}); };
