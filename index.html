@@ -15,13 +15,19 @@
         * { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; box-sizing: border-box; }
         body { background: radial-gradient(circle at top right, #eef2ff 0%, #ffffff 50%, #f0f9ff 100%); min-height: 100vh; color: #1e293b; padding-bottom: 110px; overflow-x: hidden; }
         
-        /* Loading Screen Style */
         #loading-screen { position: fixed; inset: 0; background: #fff; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s ease; }
         .loader-ring { width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid #6366f1; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         .card { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border-radius: 24px; padding: 16px; border: 1px solid rgba(255,255,255,0.8); position: relative; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.03); }
         .btn-p { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); color: #fff; width: 100%; padding: 16px; border-radius: 20px; font-weight: 800; font-size: 14px; box-shadow: 0 10px 20px -5px rgba(30,27,75,0.3); }
+        .btn-reject { background: #fee2e2; color: #ef4444; width: 100%; padding: 12px; border-radius: 18px; font-weight: 700; font-size: 12px; }
+        
+        /* Account Info Box Style */
+        .acc-box { background: #f8fafc; border: 1.5px dashed #e2e8f0; border-radius: 14px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+        .acc-label { font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+        .acc-value { font-family: 'monospace'; font-size: 11px; font-weight: 700; color: #1e293b; }
+
         .adm-nav { display: flex; background: #f1f5f9; padding: 5px; border-radius: 18px; margin-bottom: 15px; gap: 4px; overflow-x: auto; }
         .adm-tab { flex: 1; min-width: 90px; padding: 12px 8px; font-size: 10px; font-weight: 800; color: #64748b; border-radius: 14px; text-align: center; white-space: nowrap; }
         .adm-tab-active { background: #fff; color: #6366f1; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
@@ -116,12 +122,12 @@
                     <input type="text" id="set-support-url" placeholder="Support Telegram Link" class="adm-mini-input">
                     <button onclick="saveSupport()" class="btn-p py-2 text-xs">Save Link</button>
                     <hr>
-                    <div class="flex gap-2"><input type="text" id="pay-name" placeholder="Name (e.g. Bkash)" class="w-1/2 adm-mini-input"><input type="text" id="pay-num-in" placeholder="Number" class="w-1/2 adm-mini-input"></div>
+                    <div class="flex gap-2"><input type="text" id="pay-name" placeholder="Bkash" class="w-1/2 adm-mini-input"><input type="text" id="pay-num-in" placeholder="017..." class="w-1/2 adm-mini-input"></div>
                     <button onclick="addPay()" class="btn-p py-2 text-xs">Add Payment Method</button>
                     <div id="pay-list" class="space-y-2 mt-2"></div>
                 </div>
                 <div class="card space-y-3 border-2 border-indigo-100">
-                    <input type="text" id="v-name" placeholder="VPN Name (e.g. NordVPN)" class="adm-mini-input">
+                    <input type="text" id="v-name" placeholder="VPN Name" class="adm-mini-input">
                     <button onclick="addVpn()" class="btn-p py-3 text-xs">Create VPN Brand</button>
                 </div>
                 <div id="adm-vpn-list" class="space-y-4"></div>
@@ -175,12 +181,10 @@
             document.getElementById('u-pic').src = tg.initDataUnsafe?.user?.photo_url || `https://ui-avatars.com/api/?name=${UNAME}&background=6366f1&color=fff`;
             if(ADMINS.includes(UID.toString())) document.getElementById('admin-btn-nav').classList.remove('hidden');
             sync();
-
-            // Hide Loading Screen after data loads (approx 1.5s)
             setTimeout(() => {
                 document.getElementById('loading-screen').style.opacity = '0';
                 setTimeout(() => document.getElementById('loading-screen').style.display = 'none', 500);
-            }, 1500);
+            }, 1200);
         };
 
         function getVpnLogo(vName) { 
@@ -229,17 +233,44 @@
                 aP.innerHTML = ''; uBox.innerHTML = ''; let pCount = 0;
                 const d = s.val(); if(d) Object.keys(d).forEach(id => {
                     const o = d[id];
-                    if(o.st === "Pending") { pCount++; aP.innerHTML += `<div class="card space-y-3"><b>${o.user}</b><p class="text-[10px]">${o.vpn} - ${o.date || ''}</p><button onclick="showStockList('${id}','${o.vpn_id}')" class="btn-p py-3 text-[10px]">Deliver Account</button></div>`; }
-                    if(o.uid == UID) uBox.innerHTML += `<div class="card space-y-2">
-                        <div class="flex justify-between items-start">
-                            <div><b class="text-sm">${o.vpn}</b><p class="text-[9px] text-slate-400 mt-1">${o.date || ''}</p></div>
-                            <span class="text-[10px] font-bold px-2 py-1 rounded bg-indigo-50 text-indigo-600">${o.st}</span>
-                        </div>
-                        ${o.email?`<div class="bg-indigo-600 text-white p-3 rounded-xl text-[10px] mt-2 font-mono">ID: ${o.email}<br>PW: ${o.pass}</div>`:''}
-                    </div>`;
+                    if(o.st === "Pending") { 
+                        pCount++; 
+                        aP.innerHTML += `<div class="card space-y-3">
+                            <div class="flex justify-between"><b>${o.user}</b> <span class="text-[10px] font-bold text-indigo-600">${o.method}: ${o.trx}</span></div>
+                            <p class="text-[10px]">${o.vpn} (${o.plan}) - ${o.date || ''}</p>
+                            <div class="flex gap-2">
+                                <button onclick="showStockList('${id}','${o.vpn_id}')" class="btn-p py-3 text-[10px]">Deliver</button>
+                                <button onclick="rejectOrder('${id}')" class="btn-reject">Reject</button>
+                            </div>
+                        </div>`; 
+                    }
+                    if(o.uid == UID) {
+                        let stColor = o.st === "Approved" ? "bg-emerald-50 text-emerald-600" : (o.st === "Rejected" ? "bg-rose-50 text-rose-600" : "bg-indigo-50 text-indigo-600");
+                        uBox.innerHTML += `<div class="card space-y-2">
+                            <div class="flex justify-between items-start">
+                                <div><b class="text-sm">${o.vpn}</b><p class="text-[9px] text-slate-400 mt-1">${o.date || ''}</p></div>
+                                <span class="text-[10px] font-bold px-2 py-1 rounded ${stColor}">${o.st}</span>
+                            </div>
+                            
+                            ${o.email ? `
+                            <div class="mt-3 space-y-2">
+                                <div class="acc-box" onclick="copyText('${o.email}')">
+                                    <div class="flex flex-col"><span class="acc-label">Email / ID</span><span class="acc-value">${o.email}</span></div>
+                                    <i class="fa-regular fa-copy text-indigo-400 text-xs"></i>
+                                </div>
+                                <div class="acc-box" onclick="copyText('${o.pass}')">
+                                    <div class="flex flex-col"><span class="acc-label">Password</span><span class="acc-value">${o.pass}</span></div>
+                                    <i class="fa-regular fa-copy text-indigo-400 text-xs"></i>
+                                </div>
+                            </div>
+                            ` : ''}
+
+                            ${o.st === "Rejected" ? `<p class="text-[9px] text-rose-500 font-bold italic mt-2">Order was rejected by admin.</p>` : ''}
+                        </div>`;
+                    }
                 });
                 document.getElementById('p-count').innerText = pCount;
-                document.getElementById('p-count-badge').className = pCount > 0 ? 'bg-rose-500 text-white text-[10px] font-black px-2 py-1 rounded-full animate-bounce' : 'hidden';
+                document.getElementById('p-count-badge').className = pCount > 0 ? 'bg-rose-500 text-white text-[10px] font-black px-2 py-1 rounded-full' : 'hidden';
             });
 
             onValue(ref(db, 'payments'), (s) => {
@@ -252,6 +283,21 @@
             });
         }
 
+        window.rejectOrder = (id) => {
+            Swal.fire({
+                title: 'Reject Order?',
+                text: "User will see this order as rejected.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                confirmButtonText: 'Yes, Reject'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    update(ref(db, `orders/${id}`), { st: "Rejected" }).then(() => Swal.fire('Rejected!','Order has been rejected.','success'));
+                }
+            });
+        };
+
         window.saveV = (id) => update(ref(db,`vpns/${id}`), { 
             p1n: document.getElementById(`p1n-${id}`).value, p1p: document.getElementById(`p1p-${id}`).value,
             p2n: document.getElementById(`p2n-${id}`).value, p2p: document.getElementById(`p2p-${id}`).value
@@ -261,7 +307,7 @@
             const e = document.getElementById('stock-email').value, p = document.getElementById('stock-pass').value, vid = document.getElementById('stock-vpn-id').value;
             if(e && p) push(ref(db, `vpns/${vid}/stock`), { email: e, pass: p }).then(() => {
                 document.getElementById('stock-email').value = ''; document.getElementById('stock-pass').value = '';
-                Swal.fire({title:'Added', icon:'success', toast:true, timer:1000});
+                Swal.fire({title:'Stock Added', icon:'success', toast:true, position:'top', timer:1500});
             });
         };
 
@@ -297,7 +343,7 @@
                 Object.keys(snap.val()).forEach(sk => {
                     h += `<button class="w-full text-left p-4 bg-slate-50 mb-2 rounded-xl font-bold text-xs" onclick="approveSelected('${orderId}','${vpnId}','${sk}')">${snap.val()[sk].email}</button>`;
                 });
-            } else h += `<p class="text-rose-500">No stock available!</p>`;
+            } else h += `<p class="text-rose-500">Stock empty!</p>`;
             content.innerHTML = h; document.getElementById('stock-select-modal').style.display = 'flex';
         };
 
@@ -306,7 +352,7 @@
             update(ref(db, `orders/${orderId}`), { st: "Approved", email: snap.val().email, pass: snap.val().pass }).then(() => {
                 remove(ref(db, `vpns/${vpnId}/stock/${stockKey}`));
                 document.getElementById('stock-select-modal').style.display = 'none';
-                Swal.fire('Delivered','','success');
+                Swal.fire('Delivered!','Account details sent to user.','success');
             });
         };
 
