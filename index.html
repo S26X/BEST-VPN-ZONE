@@ -206,11 +206,12 @@
                     const v = d[id], count = v.stock ? Object.keys(v.stock).length : 0, isOff = v.status === "OFF";
                     const logo = getVpnLogo(v.name);
 
-                    uBox.innerHTML += `<div onclick="${(count > 0 && !isOff) ? `openPlans('${id}')` : ''}" class="card flex justify-between items-center bg-white ${(count === 0 || isOff) ? 'disabled-card' : ''}">
-                        <div class="flex items-center gap-4"><img src="${logo}" class="vpn-img"><b>${v.name}</b></div>
-                        <span class="text-[9px] font-black px-3 py-1.5 rounded-lg ${count > 0 && !isOff ? 'bg-emerald-50 text-emerald-500' : 'bg-rose-50 text-rose-500'}">
-                            ${isOff ? 'OFFLINE' : (count > 0 ? 'STOCK' : 'OUT')}
-                        </span></div>`;
+                   // স্টক থাকুক বা না থাকুক, শুধুমাত্র অ্যাডমিন সুইচ OFF থাকলে কার্ড কাজ করবে না
+                   uBox.innerHTML += `<div onclick="${!isOff ? `openPlans('${id}')` : ''}" class="card flex justify-between items-center bg-white ${isOff ? 'disabled-card' : ''}">
+                   <div class="flex items-center gap-4"><img src="${logo}" class="vpn-img"><b>${v.name}</b></div>
+                   <span class="text-[9px] font-black px-3 py-1.5 rounded-lg ${!isOff ? 'bg-emerald-50 text-emerald-500' : 'bg-rose-50 text-rose-500'}">
+                   ${isOff ? 'OFFLINE' : 'ONLINE'}
+                   </span></div>`;
 
                     aBox.innerHTML += `<div class="card space-y-4">
                         <div class="flex justify-between items-center"><div class="flex items-center gap-2"><img src="${logo}" class="w-8 h-8 rounded-lg"><b>${v.name}</b></div>
